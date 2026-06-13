@@ -427,12 +427,15 @@ button {
   width: 54px;
 }
 
-.thumb-sample {
+.upload-box .thumb-sample {
   background: #fff;
   border: 1px solid rgba(36, 54, 45, 0.1);
   border-radius: 12px;
   cursor: pointer;
+  flex: 0 0 auto;
   height: 54px;
+  margin: 0;
+  min-width: 0;
   overflow: hidden;
   padding: 0;
   transition:
@@ -441,14 +444,15 @@ button {
   width: 54px;
 }
 
-.thumb-sample img {
+.upload-box .thumb-sample img {
   display: block;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 25%;
   width: 100%;
 }
 
-.thumb-sample:hover {
+.upload-box .thumb-sample:hover {
   box-shadow: 0 10px 20px rgba(36, 54, 45, 0.22);
   transform: scale(1.14);
 }
