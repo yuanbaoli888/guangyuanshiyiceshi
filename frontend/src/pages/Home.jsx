@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import commerceAfterImage from "../assets/commerce-after.jpg";
 import commerceBeforeImage from "../assets/commerce-before.jpg";
 import dailyAfterImage from "../assets/daily-after.jpg";
@@ -101,6 +103,34 @@ function ImageAddIcon() {
 }
 
 function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
+  const inputRef = useRef(null);
+  const [preview, setPreview] = useState(null);
+  const [fileName, setFileName] = useState("");
+
+  useEffect(
+    () => () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    },
+    [preview]
+  );
+
+  function openPicker() {
+    inputRef.current?.click();
+  }
+
+  function handleFileChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    setPreview(URL.createObjectURL(file));
+    setFileName(file.name);
+    // 清空 value，确保再次选择同一文件也能触发 change
+    event.target.value = "";
+  }
+
   return (
     <article className={`upload-panel ${muted ? "muted-panel" : ""}`}>
       <div className="panel-heading">
@@ -108,10 +138,27 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
         <span>{badge}</span>
       </div>
       <div className="upload-box">
-        <span className="upload-icon">{icon}</span>
-        <strong>{action}图片</strong>
-        <button type="button">{action.replace("图片", "")}</button>
-        <small>没有图片?</small>
+        {preview ? (
+          <div className="upload-preview">
+            <img src={preview} alt={`${title}预览`} />
+          </div>
+        ) : (
+          <>
+            <span className="upload-icon">{icon}</span>
+            <strong>{action}图片</strong>
+          </>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={handleFileChange}
+        />
+        <button type="button" onClick={openPicker}>
+          {preview ? "重新选择" : action.replace("图片", "")}
+        </button>
+        <small>{fileName || "没有图片?"}</small>
         <div className="thumb-row">
           {thumbs.map((thumb) => (
             <PhotoTile key={thumb} className={thumb} label="" />

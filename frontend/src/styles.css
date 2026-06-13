@@ -354,6 +354,27 @@ button {
   font-size: 34px;
 }
 
+.upload-preview {
+  border-radius: 18px;
+  height: 140px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.upload-preview img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.upload-box small {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .upload-box button {
   background: #fff;
   border: 1px solid rgba(36, 54, 45, 0.11);
