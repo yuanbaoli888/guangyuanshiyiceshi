@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 
+import { generateTryon } from "../shared/api.js";
 import commerceAfterImage from "../assets/commerce-after.jpg";
 import commerceBeforeImage from "../assets/commerce-before.jpg";
 import dailyAfterImage from "../assets/daily-after.jpg";
@@ -248,6 +249,20 @@ function UploadPanel({ title, badge, action, samples, icon, muted = false, value
   );
 }
 
+// 把图片（blob: 或资源 URL）压到 maxSize 内并转成 jpeg data URI，再发给后端
+async function toJpegDataUrl(src, maxSize = 1536, quality = 0.9) {
+  const blob = await (await fetch(src)).blob();
+  const bitmap = await createImageBitmap(blob);
+  const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+  const width = Math.round(bitmap.width * scale);
+  const height = Math.round(bitmap.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
 function useUploadSlot() {
   const [value, setValue] = useState(null);
 
@@ -287,8 +302,42 @@ export default function Home() {
   const [ratio, setRatio] = useState("自动");
   const [size, setSize] = useState("1K");
 
+  const [generating, setGenerating] = useState(false);
+  const [result, setResult] = useState(null);
+  const [genError, setGenError] = useState("");
+
   const ready = Boolean(person.value && mainCloth.value);
   const hasAnyUpload = Boolean(person.value || mainCloth.value || bottom.value);
+
+  async function handleGenerate() {
+    if (!ready || generating) {
+      return;
+    }
+    setGenerating(true);
+    setGenError("");
+    setResult(null);
+    try {
+      const [personImg, topImg, bottomImg] = await Promise.all([
+        toJpegDataUrl(person.value.url),
+        toJpegDataUrl(mainCloth.value.url),
+        bottom.value ? toJpegDataUrl(bottom.value.url) : Promise.resolve(null),
+      ]);
+      const res = await generateTryon({
+        person_image: personImg,
+        top_image: topImg,
+        bottom_image: bottomImg,
+        style: styleCards[styleIndex][0],
+        focus,
+        ratio,
+        size,
+      });
+      setResult(res.image_url);
+    } catch (e) {
+      setGenError(e.message || "生成失败，请重试");
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   return (
     <main className="landing-page">
@@ -388,7 +437,34 @@ export default function Home() {
                 <button type="button">预览</button>
                 <button type="button">{size} 输出</button>
               </div>
-              {hasAnyUpload ? (
+              {result ? (
+                <>
+                  <div className="before-after">
+                    <article>
+                      <span>试穿前</span>
+                      <PhotoTile
+                        className="portrait-dark"
+                        image={person.value ? person.value.url : stageBeforeImage}
+                        alt="试穿前"
+                        showLabel={false}
+                      />
+                    </article>
+                    <div className="stage-divider" />
+                    <article>
+                      <span>试穿后</span>
+                      <PhotoTile className="portrait-light" image={result} alt="试穿后" showLabel={false} />
+                    </article>
+                  </div>
+                  <a className="stage-download" href={result} target="_blank" rel="noreferrer">
+                    下载 / 查看大图
+                  </a>
+                </>
+              ) : generating ? (
+                <div className="stage-loading">
+                  <span className="spinner" />
+                  <p>正在生成试衣效果，请稍候…</p>
+                </div>
+              ) : hasAnyUpload ? (
                 <div className="stage-ready">
                 <div className="stage-ready-head">
                   <div>
@@ -546,9 +622,16 @@ export default function Home() {
                 ))}
               </div>
               <small>登录后解锁 2K，升级解锁 4K。</small>
-              <button className="generate-button" type="button" disabled={!ready}>
-                ⌁ 一键试衣
+              <button
+                className="generate-button"
+                type="button"
+                disabled={!ready || generating}
+                onClick={handleGenerate}
+              >
+                {generating ? "生成中…" : "⌁ 一键试衣"}
               </button>
+              {!ready && <small className="gen-hint">请先放好人物照和主服装图。</small>}
+              {genError && <small className="gen-error">{genError}</small>}
             </section>
           </aside>
         </div>
