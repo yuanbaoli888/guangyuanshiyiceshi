@@ -109,6 +109,7 @@ export default function Home() {
             image={dailyBeforeImage}
             hoverImage={dailyAfterImage}
             alt="日常真实风格人物照"
+            showLabel={false}
           />
           <PhotoTile
             className="portrait-three"
