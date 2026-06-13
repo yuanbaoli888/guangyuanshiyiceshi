@@ -131,23 +131,18 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
     event.target.value = "";
   }
 
+  function clearImage() {
+    setPreview(null);
+    setFileName("");
+  }
+
   return (
     <article className={`upload-panel ${muted ? "muted-panel" : ""}`}>
       <div className="panel-heading">
         <h3>{title}</h3>
         <span>{badge}</span>
       </div>
-      <div className="upload-box">
-        {preview ? (
-          <div className="upload-preview">
-            <img src={preview} alt={`${title}预览`} />
-          </div>
-        ) : (
-          <>
-            <span className="upload-icon">{icon}</span>
-            <strong>{action}图片</strong>
-          </>
-        )}
+      <div className={`upload-box ${preview ? "has-preview" : ""}`}>
         <input
           ref={inputRef}
           type="file"
@@ -155,15 +150,33 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
           hidden
           onChange={handleFileChange}
         />
-        <button type="button" onClick={openPicker}>
-          {preview ? "重新选择" : action.replace("图片", "")}
-        </button>
-        <small>{fileName || "没有图片?"}</small>
-        <div className="thumb-row">
-          {thumbs.map((thumb) => (
-            <PhotoTile key={thumb} className={thumb} label="" />
-          ))}
-        </div>
+        {preview ? (
+          <div className="upload-filled">
+            <img src={preview} alt={`${title}预览`} />
+            <button
+              type="button"
+              className="upload-clear"
+              onClick={clearImage}
+              aria-label="移除图片"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <>
+            <span className="upload-icon">{icon}</span>
+            <strong>{action}图片</strong>
+            <button type="button" onClick={openPicker}>
+              {action.replace("图片", "")}
+            </button>
+            <small>{fileName || "没有图片?"}</small>
+            <div className="thumb-row">
+              {thumbs.map((thumb) => (
+                <PhotoTile key={thumb} className={thumb} label="" />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </article>
   );

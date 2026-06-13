@@ -354,25 +354,43 @@ button {
   font-size: 34px;
 }
 
-.upload-preview {
-  border-radius: 18px;
-  height: 140px;
-  overflow: hidden;
+.upload-box.has-preview {
+  padding: 14px;
+}
+
+.upload-filled {
+  position: relative;
   width: 100%;
 }
 
-.upload-preview img {
+.upload-filled img {
+  border-radius: 20px;
   display: block;
-  height: 100%;
+  height: 320px;
   object-fit: cover;
   width: 100%;
 }
 
-.upload-box small {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.upload-clear {
+  align-items: center;
+  background: rgba(60, 64, 60, 0.55);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 22px;
+  height: 38px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 38px;
+}
+
+.upload-clear:hover {
+  background: rgba(40, 44, 40, 0.72);
 }
 
 .upload-box button {
