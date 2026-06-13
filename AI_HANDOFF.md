@@ -8,13 +8,13 @@
 
 ## 项目当前目标
 
-这个项目最初是一个 `FastAPI + React + SQLite` 全栈认证脚手架，现在正在往一个名为 `AnyTryOn` 的在线虚拟试穿产品页面方向演进。
+这个项目最初是一个 `FastAPI + React + SQLite` 全栈认证脚手架，现在正在往一个名为 `光原TryOn`（Guangyuan TryOn）的在线虚拟试穿产品页面方向演进。
 
 当前优先目标：
 
-- 先把用户提供截图里的完整首页 UI 做出来。
-- 首页目前以静态展示为主，先保留截图中的全部信息和模块。
-- 后续再逐步替换真实图片素材、调整视觉细节、接入真实上传/试穿逻辑。
+- 首页 UI 第一版已完成（对照用户截图），目前以静态展示为主。
+- Hero 区图片素材已替换为真实图片，并加了 hover 切换效果。
+- 后续重点：继续微调视觉细节、把上传/预览/按钮做成可交互、接入真实试穿逻辑。
 
 ## 当前技术栈
 
@@ -28,14 +28,17 @@
 
 当前分支：`main`
 
-最近重要提交：
+最近重要提交（`main` 顶部，新到旧）：
 
-- `5b4c2ff Initial fullstack auth scaffold`
-  - 初始全栈认证脚手架。
-  - 包含前端登录/注册/受保护页面，后端认证接口，SQLite 和 Alembic。
-- `a9cf134 Build AnyTryOn landing page`
-  - 将首页改造成 AnyTryOn 风格长页面。
-  - 保留了用户截图中的主要模块和文字。
+- `7658f3c / 8be6836 / 4bf8184 / 09d4052 Hide hero tile labels`
+  - 隐藏 Hero 拼贴四格上的文字标签（fashion / commerce / daily / person）。
+- `294dec7 Rename brand to Guangyuan TryOn`
+  - 品牌从 `AnyTryOn` 统一改名为 `光原TryOn`（全站文案、品牌标、footer、版权）。
+- `a757d26 Add hover swaps for hero style tiles`
+  - Hero 风格卡片增加 hover 切换图（鼠标悬停时 before → after）。
+- `f02fddb Remove cookie choice card`
+  - 移除首页早期的 Cookie 选择卡片。
+- 更早：`a9cf134 Build AnyTryOn landing page`（首页第一版）、`5b4c2ff Initial fullstack auth scaffold`（初始认证脚手架）。
 
 当前工作区在写入本文件前是干净状态。
 
@@ -43,46 +46,44 @@
 
 ### 后端
 
-后端仍是初始认证脚手架：
+后端仍是初始认证脚手架，**尚未新增任何试穿（tryon）接口**：
 
 - `/health`
-- `/auth/register`
-- `/auth/login`
-- `/auth/logout`
-- `/auth/me`
-- `/users` 相关用户接口
+- `/auth/register`、`/auth/login`、`/auth/logout`、`/auth/me`
+- `/users` 用户接口（列表 / me / 按 id 查 / 改 / 删）
 - SQLite 数据库配置
 - Alembic 迁移
 
+路由挂载见 `backend/app/main.py`（`health` / `auth` / `users` 三个 router）。
+
 ### 前端
 
-当前首页已经改成 AnyTryOn landing page 第一版，主要文件：
+当前首页是 `光原TryOn` landing page，主要文件：
 
-- `frontend/src/App.jsx`
-- `frontend/src/pages/Home.jsx`
-- `frontend/src/styles.css`
+- `frontend/src/App.jsx`（顶栏导航 + 路由 + 品牌点击回顶）
+- `frontend/src/pages/Home.jsx`（首页全部区块，约 400 行）
+- `frontend/src/styles.css`（约 1400 行样式）
+- `frontend/src/assets/`（真实图片素材：commerce / daily / fashion / tryon-person 各有 before + after，共 8 张）
 
-首页包含：
+顶部导航（在 `App.jsx`）：品牌 `光`/`光原TryOn`、`使用指南`、`常见问题`、`试穿`、`定价`、语言选择、登录/控制台/退出按钮（按登录态切换）。
 
-- 顶部导航：`AnyTryOn.`、`使用指南`、`常见问题`、`试穿`、`定价`、语言选择、登录按钮
-- Hero：`在线虚拟 试穿 工具`
-- Cookie 选择卡片
-- 虚拟试穿工作区：
-  - 人物照上传
-  - 主服装图上传
-  - 下装图上传
-  - 试穿前/试穿后预览
-  - 风格选择
-  - 关注点、比例、尺寸、一键试衣
+首页区块（按 `Home.jsx` 顺序）：
+
+- Hero（`#try-on`）：标题 `在线虚拟 试穿 工具` + 右侧四格拼贴，已用真实图，**hover 时 before → after 切换**，四格文字标签已隐藏。
+- 虚拟试穿工作区（`#workspace`）：
+  - 左：人物照（必选）、主服装图（必选）、下装图（可选）上传面板
+  - 中：试穿前/试穿后预览、主服装图/下装图素材
+  - 右：风格选择、关注点、比例、尺寸、`一键试衣`
 - `先试穿，再决定穿什么`
-- `为什么先做虚拟试穿`
-- `如何用 AnyTryOn 在线试穿衣服`
-- `需要更具体的试穿场景？`
-- FAQ
+- `为什么先做虚拟试穿`（有无虚拟试穿对比）
+- `如何用 光原TryOn 在线试穿衣服`（`#guide`，三步）
+- `需要更具体的试穿场景？`（`#pricing`，场景卡片）
+- FAQ（`#faq`，折叠列表，答案为占位文案）
 - 底部 CTA
 - Footer
+- 右下角悬浮工具按钮
 
-注意：当前图片区域是模拟照片占位，还没有替换成真实素材。
+注意：Hero 四格已是真实图片；工作区内部分缩略图（cloth/pants/portrait 等）仍是 CSS 占位块，FAQ 答案也仍是占位文案。早期的 Cookie 选择卡片已移除。
 
 ## 启动方式
 
@@ -157,18 +158,19 @@ cd backend
 git reset --hard 5b4c2ff
 ```
 
-回到初始脚手架，然后又重新做了 AnyTryOn 首页。
+回到初始脚手架，然后又重新做了首页（即现在的 `光原TryOn` landing page）。
 
 ## 下一步建议
 
 优先下一步可以做：
 
 1. 对照用户截图继续微调首页视觉细节。
-2. 替换真实人物/服装图片素材。
+2. 替换工作区内剩余的占位缩略图（Hero 四格已用真实图，此项部分完成）。
 3. 把登录按钮、开始虚拟试穿按钮和工作区交互串起来。
 4. 做上传图片预览逻辑。
-5. 后端新增试穿任务 API 草案，例如 `/tryon/jobs`。
-6. 后续再接入真实 AI 图片生成服务。
+5. 补全 FAQ 折叠项的真实答案文案。
+6. 后端新增试穿任务 API 草案，例如 `/tryon/jobs`（目前后端无任何 tryon 接口）。
+7. 后续再接入真实 AI 图片生成服务。
 
 ## 给新 AI 的注意事项
 
