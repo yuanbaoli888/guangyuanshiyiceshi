@@ -82,7 +82,7 @@ export default function Home() {
             工具
           </h1>
           <p>
-            AnyTryOn 是免费的在线虚拟试穿工具：上传人物照和服装图，在购买或决定穿搭前预览上身效果。首次生成无需登录且免费，下载结果无水印。
+            光源TryOn 是免费的在线虚拟试穿工具：上传人物照和服装图，在购买或决定穿搭前预览上身效果。首次生成无需登录且免费，下载结果无水印。
           </p>
           <a className="dark-cta" href="#workspace">
             开始虚拟试穿 <span aria-hidden="true">⌁</span>

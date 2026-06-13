@@ -219,7 +219,7 @@ button {
   letter-spacing: -0.07em;
   line-height: 0.9;
   margin: 0 0 34px;
-  max-width: 610px;
+  max-width: 500px;
 }
 
 .hero-copy h1 span {
@@ -233,7 +233,7 @@ button {
   font-size: 22px;
   line-height: 1.8;
   margin: 0 0 42px;
-  max-width: 570px;
+  max-width: 400px;
 }
 
 .dark-cta {
@@ -246,7 +246,10 @@ button {
   font-size: 18px;
   font-weight: 900;
   gap: 14px;
-  padding: 22px 48px;
+  justify-content: center;
+  padding: 22px 28px;
+  white-space: nowrap;
+  width: 200px;
 }
 
 .hero-collage {
@@ -257,17 +260,19 @@ button {
   display: grid;
   gap: 18px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  height: 980px;
   padding: 26px;
   transform: translateY(34px);
 }
 
 .hero-collage .photo-tile {
-  min-height: 250px;
+  min-height: 0;
 }
 
 .hero-collage .photo-tile:nth-child(3),
 .hero-collage .photo-tile:nth-child(4) {
-  min-height: 310px;
+  min-height: 0;
 }
 
 .workspace-section {
@@ -1349,6 +1354,15 @@ th {
   .settings-column,
   .upload-column {
     grid-template-columns: 1fr;
+  }
+
+  .hero-collage {
+    grid-template-rows: none;
+    height: auto;
+  }
+
+  .hero-collage .photo-tile {
+    min-height: 250px;
   }
 
   .stage-divider {
