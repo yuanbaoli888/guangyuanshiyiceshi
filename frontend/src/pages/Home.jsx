@@ -125,6 +125,7 @@ export default function Home() {
             image={fashionBeforeImage}
             hoverImage={fashionAfterImage}
             alt="时尚大片风格人物照"
+            showLabel={false}
           />
         </div>
       </section>
