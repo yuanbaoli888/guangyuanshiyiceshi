@@ -1,4 +1,4 @@
-import { Link, Navigate, Route, Routes } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
 import { useAuth } from "./shared/useAuth.js";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -17,11 +17,20 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBrandClick = (event) => {
+    event.preventDefault();
+    navigate("/");
+    window.setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }, 0);
+  };
 
   return (
     <div className="app-shell">
       <header className="topbar">
-        <Link className="brand anytry-brand" to="/">
+        <Link className="brand anytry-brand" to="/" onClick={handleBrandClick}>
           <span className="brand-mark">光</span>
           <span>光源TryOn</span>
         </Link>
