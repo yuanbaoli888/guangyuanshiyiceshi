@@ -6,6 +6,8 @@ import fashionAfterImage from "../assets/fashion-after.jpg";
 import fashionBeforeImage from "../assets/fashion-before.jpg";
 import personAfterImage from "../assets/tryon-person-after.jpg";
 import personBeforeImage from "../assets/tryon-person-before.jpg";
+import stageAfterImage from "../assets/stage-after.jpg";
+import stageBeforeImage from "../assets/stage-before.jpg";
 
 const styleCards = [
   ["原生风格", "最接近原图", "portrait-one"],
@@ -164,12 +166,22 @@ export default function Home() {
               <div className="before-after">
                 <article>
                   <span>试穿前</span>
-                  <PhotoTile className="portrait-dark" label="试穿前" />
+                  <PhotoTile
+                    className="portrait-dark"
+                    image={stageBeforeImage}
+                    alt="试穿前：白色衬衫人物照"
+                    showLabel={false}
+                  />
                 </article>
                 <div className="stage-divider" />
                 <article>
                   <span>试穿后</span>
-                  <PhotoTile className="portrait-light" label="试穿后" />
+                  <PhotoTile
+                    className="portrait-light"
+                    image={stageAfterImage}
+                    alt="试穿后：蓝白条纹上衣效果"
+                    showLabel={false}
+                  />
                 </article>
               </div>
             </div>
