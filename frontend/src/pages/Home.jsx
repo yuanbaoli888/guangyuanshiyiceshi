@@ -219,7 +219,6 @@ export default function Home() {
 
   const ready = Boolean(person.value && mainCloth.value);
   const hasAnyUpload = Boolean(person.value || mainCloth.value || bottom.value);
-  const styleLabel = styleCards[styleIndex][0];
 
   return (
     <main className="landing-page">
@@ -326,10 +325,6 @@ export default function Home() {
                         ? "人物照和主服装图已选好，现在可以生成试衣结果。"
                         : "请先上传人物照和主服装图，下装为可选项。"}
                     </p>
-                  </div>
-                  <div className="stage-tags">
-                    <span>{styleLabel}</span>
-                    <span>{size} 输出</span>
                   </div>
                 </div>
                 <div className="material-cards">
