@@ -563,6 +563,22 @@ button {
   opacity: 0.45;
 }
 
+.asset-empty {
+  align-items: center;
+  color: #aab0aa;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  margin: 0 auto 18px;
+  min-height: 96px;
+}
+
+.asset-empty span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .before-after {
   align-items: center;
   border: 1px solid rgba(255, 255, 255, 0.14);

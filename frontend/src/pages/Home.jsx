@@ -119,6 +119,35 @@ function ImageAddIcon() {
   );
 }
 
+function LayersIcon() {
+  return (
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+      <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+      <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
+    </svg>
+  );
+}
+
+function AssetEmpty() {
+  return (
+    <div className="asset-empty">
+      <LayersIcon />
+      <span>未使用</span>
+    </div>
+  );
+}
+
 function UploadPanel({ title, badge, action, thumbs, icon, muted = false, value, onSelect, onClear }) {
   const inputRef = useRef(null);
 
@@ -389,12 +418,11 @@ export default function Home() {
             </div>
             <div className="preview-assets">
               <article>
-                <PhotoTile
-                  className="cloth-one"
-                  image={mainCloth.value ? mainCloth.value.url : undefined}
-                  label=""
-                  showLabel={false}
-                />
+                {mainCloth.value ? (
+                  <PhotoTile className="cloth-one" image={mainCloth.value.url} label="" showLabel={false} />
+                ) : (
+                  <AssetEmpty />
+                )}
                 <h3>主服装图</h3>
                 <p>{mainCloth.value ? "已选用于本次生成" : "示例预览中使用的衣服"}</p>
               </article>
@@ -402,7 +430,7 @@ export default function Home() {
                 {bottom.value ? (
                   <PhotoTile className="pants-one" image={bottom.value.url} label="" showLabel={false} />
                 ) : (
-                  <span className="empty-icon">▱</span>
+                  <AssetEmpty />
                 )}
                 <h3>下装图</h3>
                 <p>{bottom.value ? "本次生成使用了这个可选槽位" : "示例预览未展示可选单品"}</p>
