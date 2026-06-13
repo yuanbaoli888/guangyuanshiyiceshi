@@ -1089,6 +1089,30 @@ button {
   object-position: 50% 18%;
 }
 
+.portrait-two.photo-tile-image .photo-tile-img-default {
+  object-position: 50% 28%;
+}
+
+.portrait-two.photo-tile-image .photo-tile-img-hover {
+  object-position: 50% 18%;
+}
+
+.portrait-three.photo-tile-image .photo-tile-img-default {
+  object-position: 54% 24%;
+}
+
+.portrait-three.photo-tile-image .photo-tile-img-hover {
+  object-position: 50% 28%;
+}
+
+.portrait-four.photo-tile-image .photo-tile-img-default {
+  object-position: 50% 20%;
+}
+
+.portrait-four.photo-tile-image .photo-tile-img-hover {
+  object-position: 50% 22%;
+}
+
 .photo-tile-hover-swap:hover .photo-tile-img-default {
   opacity: 0;
   transform: scale(1.03);

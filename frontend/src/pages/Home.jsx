@@ -1,3 +1,9 @@
+import commerceAfterImage from "../assets/commerce-after.jpg";
+import commerceBeforeImage from "../assets/commerce-before.jpg";
+import dailyAfterImage from "../assets/daily-after.jpg";
+import dailyBeforeImage from "../assets/daily-before.jpg";
+import fashionAfterImage from "../assets/fashion-after.jpg";
+import fashionBeforeImage from "../assets/fashion-before.jpg";
 import personAfterImage from "../assets/tryon-person-after.jpg";
 import personBeforeImage from "../assets/tryon-person-before.jpg";
 
@@ -96,9 +102,27 @@ export default function Home() {
             hoverImage={personAfterImage}
             alt="金发女性人物照"
           />
-          <PhotoTile className="portrait-two" label="日常真实" />
-          <PhotoTile className="portrait-three" label="电商展示" />
-          <PhotoTile className="portrait-four" label="时尚大片" />
+          <PhotoTile
+            className="portrait-two"
+            label="日常真实"
+            image={dailyBeforeImage}
+            hoverImage={dailyAfterImage}
+            alt="日常真实风格人物照"
+          />
+          <PhotoTile
+            className="portrait-three"
+            label="电商展示"
+            image={commerceBeforeImage}
+            hoverImage={commerceAfterImage}
+            alt="电商展示风格人物照"
+          />
+          <PhotoTile
+            className="portrait-four"
+            label="时尚大片"
+            image={fashionBeforeImage}
+            hoverImage={fashionAfterImage}
+            alt="时尚大片风格人物照"
+          />
         </div>
       </section>
 
