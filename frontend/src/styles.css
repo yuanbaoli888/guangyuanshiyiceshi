@@ -261,7 +261,7 @@ button {
   gap: 18px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  height: 980px;
+  height: 900px;
   padding: 26px;
   transform: translateY(34px);
 }
