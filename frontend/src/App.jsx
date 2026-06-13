@@ -23,7 +23,7 @@ export default function App() {
       <header className="topbar">
         <Link className="brand anytry-brand" to="/">
           <span className="brand-mark">光</span>
-          <span>AnyTryOn.</span>
+          <span>光源TryOn</span>
         </Link>
         <nav className="site-nav" aria-label="Main navigation">
           <a href="#guide">使用指南</a>
