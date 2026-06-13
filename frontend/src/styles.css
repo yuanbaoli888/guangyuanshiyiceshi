@@ -270,52 +270,6 @@ button {
   min-height: 310px;
 }
 
-.cookie-card {
-  background: rgba(255, 253, 247, 0.9);
-  border-radius: 24px;
-  bottom: 28px;
-  box-shadow: var(--shadow);
-  left: 28px;
-  max-width: 580px;
-  padding: 26px;
-  position: absolute;
-}
-
-.cookie-card h2 {
-  font-family: var(--serif);
-  font-size: 28px;
-  margin: 0 0 8px;
-}
-
-.cookie-card p {
-  color: #8c918b;
-  margin: 0 0 18px;
-}
-
-.cookie-card div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.cookie-card button {
-  background: transparent;
-  border: 0;
-  border-radius: 999px;
-  color: var(--ink);
-  font-weight: 800;
-  padding: 12px 20px;
-}
-
-.cookie-card button:first-child {
-  background: var(--ink);
-  color: #fff;
-}
-
-.cookie-card button:nth-child(2) {
-  border: 1px solid rgba(201, 121, 98, 0.24);
-}
-
 .workspace-section {
   padding: 42px 28px 110px;
 }
@@ -1345,11 +1299,6 @@ th {
 
   .hero-copy p {
     font-size: 17px;
-  }
-
-  .cookie-card {
-    margin-top: 24px;
-    position: static;
   }
 
   .hero-collage,

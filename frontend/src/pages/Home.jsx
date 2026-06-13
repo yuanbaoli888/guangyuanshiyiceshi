@@ -82,15 +82,6 @@ export default function Home() {
           <PhotoTile className="portrait-three" label="电商展示" />
           <PhotoTile className="portrait-four" label="时尚大片" />
         </div>
-        <aside className="cookie-card">
-          <h2>Cookie 选择</h2>
-          <p>必要 Cookie 会用于工作室运行；分析与会话回放会在你选择前保持关闭。</p>
-          <div>
-            <button type="button">全部接受</button>
-            <button type="button">拒绝非必要</button>
-            <button type="button">管理设置</button>
-          </div>
-        </aside>
       </section>
 
       <section className="workspace-section" id="workspace" aria-label="AnyTryOn 工作区">
