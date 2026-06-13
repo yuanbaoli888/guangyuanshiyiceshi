@@ -34,8 +34,8 @@ const faqItems = [
   "需要登录吗？积分和清晰度怎么算?",
   "我的照片安全吗?",
   "可以下载并用于商用吗?",
-  "AnyTryOn 是免费的虚拟试穿工具吗?",
-  "也可以用 AnyTryOn 给照片换衣服吗?",
+  "光原TryOn 是免费的虚拟试穿工具吗?",
+  "也可以用 光原TryOn 给照片换衣服吗?",
 ];
 
 function PhotoTile({ className = "", label, image, hoverImage, alt }) {
@@ -88,7 +88,7 @@ export default function Home() {
             工具
           </h1>
           <p>
-            光源TryOn 是免费的在线虚拟试穿工具：上传人物照和服装图，在购买或决定穿搭前预览上身效果。首次生成无需登录且免费，下载结果无水印。
+            光原TryOn 是免费的在线虚拟试穿工具：上传人物照和服装图，在购买或决定穿搭前预览上身效果。首次生成无需登录且免费，下载结果无水印。
           </p>
           <a className="dark-cta" href="#workspace">
             开始虚拟试穿 <span aria-hidden="true">⌁</span>
@@ -126,7 +126,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="workspace-section" id="workspace" aria-label="AnyTryOn 工作区">
+      <section className="workspace-section" id="workspace" aria-label="光原TryOn 工作区">
         <div className="workspace-grid">
           <aside className="upload-column">
             <UploadPanel
@@ -151,7 +151,7 @@ export default function Home() {
           </aside>
 
           <section className="preview-column">
-            <h2>AnyTryOn</h2>
+            <h2>光原TryOn</h2>
             <div className="preview-stage">
               <div className="stage-actions">
                 <button type="button">预览</button>
@@ -241,7 +241,7 @@ export default function Home() {
       <section className="decision-section">
         <div className="section-heading">
           <h2>先试穿，再决定穿什么</h2>
-          <p>在购买、出门或分享穿搭前，用 AnyTryOn 先确认衣服穿到人物身上的效果。</p>
+          <p>在购买、出门或分享穿搭前，用 光原TryOn 先确认衣服穿到人物身上的效果。</p>
         </div>
         <div className="decision-grid">
           <div className="value-stack">
@@ -277,7 +277,7 @@ export default function Home() {
             </ul>
           </article>
           <article>
-            <span>使用 ANYTRYON</span>
+            <span>使用 光原TryOn</span>
             <ul>
               <li>从一张人物照和服装图开始。</li>
               <li>通常 1 分钟左右得到真实试衣预览。</li>
@@ -291,7 +291,7 @@ export default function Home() {
 
       <section className="guide-section" id="guide">
         <div className="section-heading">
-          <h2>如何用 AnyTryOn 在线试穿衣服</h2>
+          <h2>如何用 光原TryOn 在线试穿衣服</h2>
           <p>不用写提示词，也不用设计工具。添加人物照和服装图，选择风格和关注点，就能下载用于购买或穿搭决策的无水印试衣图。</p>
         </div>
         <div className="step-grid">
@@ -364,7 +364,7 @@ export default function Home() {
       <footer className="site-footer">
         <div className="footer-grid">
           <section>
-            <h2>AnyTryOn.</h2>
+            <h2>光原TryOn.</h2>
             <p>在线虚拟试穿工作区：上传人物照和服装图，在购买或决定穿搭前预览上身效果。</p>
             <h3>法律条款</h3>
             <a href="#faq">隐私政策</a>
@@ -386,7 +386,7 @@ export default function Home() {
             <a href="#faq">联系我们</a>
           </section>
         </div>
-        <p className="copyright">© 2026 AnyTryOn. 购买、搭配、上架前先看效果。</p>
+        <p className="copyright">© 2026 光原TryOn. 购买、搭配、上架前先看效果。</p>
       </footer>
 
       <div className="floating-tools" aria-label="快捷工具">
