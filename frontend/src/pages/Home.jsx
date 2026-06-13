@@ -20,16 +20,6 @@ import sampleTop2 from "../assets/sample-top-2.jpg";
 import sampleTop3 from "../assets/sample-top-3.jpg";
 import stageAfterImage from "../assets/stage-after.jpg";
 import stageBeforeImage from "../assets/stage-before.jpg";
-import styleCommerceImage from "../assets/style-commerce.jpg";
-import styleDailyImage from "../assets/style-daily.jpg";
-import styleNativeImage from "../assets/style-native.jpg";
-
-const styleCards = [
-  ["原生风格", "最接近原图", styleNativeImage],
-  ["日常真实", "自然细节", styleDailyImage],
-  ["电商展示", "突出商品", styleCommerceImage],
-  ["时尚大片", "更强氛围", samplePerson2],
-];
 
 // 各面板的示例图库：没有自己照片的访客可一键载入
 const personSamples = [
@@ -48,21 +38,10 @@ const bottomSamples = [
   { url: sampleBottom3, name: "示例下装 3" },
 ];
 
-// 比例选项：w/h 为示意小图标的像素尺寸（自动无图标）
-const ratioOptions = [
-  { label: "自动", w: 0, h: 0 },
-  { label: "1:1", w: 22, h: 22 },
-  { label: "3:4", w: 18, h: 24 },
-  { label: "4:3", w: 24, h: 18 },
-  { label: "9:16", w: 14, h: 24 },
-  { label: "16:9", w: 24, h: 14 },
-];
-
-// 尺寸选项：2K/4K 需登录或升级，暂锁定（后续接 API 再解锁）
+// 尺寸选项：2K -> nano-banana-2-2k，4K -> nano-banana-2-4k（后端按 size 关联模型）
 const sizeOptions = [
-  { label: "1K", note: "极速 2 积分", locked: false },
-  { label: "2K", note: "2 积分", locked: true },
-  { label: "4K", note: "未解锁 升级", locked: true },
+  { label: "2K", note: "标准 2 积分" },
+  { label: "4K", note: "高清 4 积分" },
 ];
 
 const featureCards = [
@@ -297,10 +276,8 @@ export default function Home() {
   const mainCloth = useUploadSlot();
   const bottom = useUploadSlot();
 
-  const [styleIndex, setStyleIndex] = useState(0);
   const [focus, setFocus] = useState("服装");
-  const [ratio, setRatio] = useState("自动");
-  const [size, setSize] = useState("1K");
+  const [size, setSize] = useState("2K");
 
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState(null);
@@ -326,9 +303,7 @@ export default function Home() {
         person_image: personImg,
         top_image: topImg,
         bottom_image: bottomImg,
-        style: styleCards[styleIndex][0],
         focus,
-        ratio,
         size,
       });
       setResult(res.image_url);
@@ -559,24 +534,6 @@ export default function Home() {
           </section>
 
           <aside className="settings-column">
-            <h2>下一步调整</h2>
-            <section className="settings-card">
-              <h3>风格</h3>
-              <div className="style-grid">
-                {styleCards.map(([title, text, image], index) => (
-                  <button
-                    className={index === styleIndex ? "selected" : ""}
-                    key={title}
-                    type="button"
-                    onClick={() => setStyleIndex(index)}
-                  >
-                    <PhotoTile className="style-thumb" image={image} alt={title} label="" showLabel={false} />
-                    <strong>{title}</strong>
-                    <small>{text}</small>
-                  </button>
-                ))}
-              </div>
-            </section>
             <section className="settings-card">
               <h3>设置</h3>
               <p>关注点</p>
@@ -592,26 +549,11 @@ export default function Home() {
                   </button>
                 ))}
               </div>
-              <p>比例</p>
-              <div className="ratio-grid">
-                {ratioOptions.map(({ label, w, h }) => (
-                  <button
-                    className={ratio === label ? "selected" : ""}
-                    key={label}
-                    type="button"
-                    onClick={() => setRatio(label)}
-                  >
-                    {w ? <span className="ratio-shape" style={{ width: w, height: h }} /> : null}
-                    <span>{label}</span>
-                  </button>
-                ))}
-              </div>
               <p>尺寸</p>
               <div className="size-grid">
-                {sizeOptions.map(({ label, note, locked }) => (
+                {sizeOptions.map(({ label, note }) => (
                   <button
                     className={size === label ? "selected" : ""}
-                    disabled={locked}
                     key={label}
                     type="button"
                     onClick={() => setSize(label)}
@@ -621,7 +563,7 @@ export default function Home() {
                   </button>
                 ))}
               </div>
-              <small>登录后解锁 2K，升级解锁 4K。</small>
+              <small>2K 为香蕉 2K 模型，4K 为香蕉 4K 模型。</small>
               <button
                 className="generate-button"
                 type="button"
