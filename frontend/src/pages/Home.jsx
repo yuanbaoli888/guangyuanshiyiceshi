@@ -57,7 +57,50 @@ function PhotoTile({ className = "", label, image, hoverImage, alt, showLabel = 
   );
 }
 
-function UploadPanel({ title, badge, action, thumbs, muted = false }) {
+const iconProps = {
+  width: 34,
+  height: 34,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+};
+
+function PersonAddIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <line x1="19" x2="19" y1="8" y2="14" />
+      <line x1="22" x2="16" y1="11" y2="11" />
+    </svg>
+  );
+}
+
+function ShirtIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+    </svg>
+  );
+}
+
+function ImageAddIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
+      <line x1="16" x2="22" y1="5" y2="5" />
+      <line x1="19" x2="19" y1="2" y2="8" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+    </svg>
+  );
+}
+
+function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
   return (
     <article className={`upload-panel ${muted ? "muted-panel" : ""}`}>
       <div className="panel-heading">
@@ -65,7 +108,7 @@ function UploadPanel({ title, badge, action, thumbs, muted = false }) {
         <span>{badge}</span>
       </div>
       <div className="upload-box">
-        <span className="upload-icon">⌁</span>
+        <span className="upload-icon">{icon}</span>
         <strong>{action}图片</strong>
         <button type="button">{action.replace("图片", "")}</button>
         <small>没有图片?</small>
@@ -139,18 +182,21 @@ export default function Home() {
               title="人物照"
               badge="必选"
               action="添加人物"
+              icon={<PersonAddIcon />}
               thumbs={["portrait-one", "portrait-two", "portrait-three"]}
             />
             <UploadPanel
               title="主服装图"
               badge="必选"
               action="添加主服装"
+              icon={<ShirtIcon />}
               thumbs={["cloth-one", "cloth-two", "cloth-three"]}
             />
             <UploadPanel
               title="下装图"
               badge="可选"
               action="添加下装"
+              icon={<ImageAddIcon />}
               thumbs={["pants-one", "pants-two", "pants-three"]}
               muted
             />

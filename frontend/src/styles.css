@@ -350,6 +350,7 @@ button {
 
 .upload-icon {
   color: var(--accent);
+  display: inline-flex;
   font-size: 34px;
 }
 
