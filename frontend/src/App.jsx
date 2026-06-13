@@ -22,7 +22,7 @@ export default function App() {
     <div className="app-shell">
       <header className="topbar">
         <Link className="brand anytry-brand" to="/">
-          <span className="brand-mark">A</span>
+          <span className="brand-mark">光</span>
           <span>AnyTryOn.</span>
         </Link>
         <nav className="site-nav" aria-label="Main navigation">
