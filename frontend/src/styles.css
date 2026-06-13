@@ -427,6 +427,32 @@ button {
   width: 54px;
 }
 
+.thumb-sample {
+  background: #fff;
+  border: 1px solid rgba(36, 54, 45, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  height: 54px;
+  overflow: hidden;
+  padding: 0;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+  width: 54px;
+}
+
+.thumb-sample img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.thumb-sample:hover {
+  box-shadow: 0 10px 20px rgba(36, 54, 45, 0.22);
+  transform: scale(1.14);
+}
+
 .preview-column h2,
 .settings-column > h2 {
   font-family: var(--serif);

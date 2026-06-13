@@ -8,6 +8,15 @@ import fashionAfterImage from "../assets/fashion-after.jpg";
 import fashionBeforeImage from "../assets/fashion-before.jpg";
 import personAfterImage from "../assets/tryon-person-after.jpg";
 import personBeforeImage from "../assets/tryon-person-before.jpg";
+import sampleBottom1 from "../assets/sample-bottom-1.jpg";
+import sampleBottom2 from "../assets/sample-bottom-2.jpg";
+import sampleBottom3 from "../assets/sample-bottom-3.jpg";
+import samplePerson1 from "../assets/sample-person-1.jpg";
+import samplePerson2 from "../assets/sample-person-2.jpg";
+import samplePerson3 from "../assets/sample-person-3.jpg";
+import sampleTop1 from "../assets/sample-top-1.jpg";
+import sampleTop2 from "../assets/sample-top-2.jpg";
+import sampleTop3 from "../assets/sample-top-3.jpg";
 import stageAfterImage from "../assets/stage-after.jpg";
 import stageBeforeImage from "../assets/stage-before.jpg";
 
@@ -16,6 +25,23 @@ const styleCards = [
   ["日常真实", "自然细节", "portrait-two"],
   ["电商展示", "突出商品", "portrait-three"],
   ["时尚大片", "更强氛围", "portrait-four"],
+];
+
+// 各面板的示例图库：没有自己照片的访客可一键载入
+const personSamples = [
+  { url: samplePerson1, name: "示例人物 1" },
+  { url: samplePerson2, name: "示例人物 2" },
+  { url: samplePerson3, name: "示例人物 3" },
+];
+const topSamples = [
+  { url: sampleTop1, name: "示例上衣 1" },
+  { url: sampleTop2, name: "示例上衣 2" },
+  { url: sampleTop3, name: "示例上衣 3" },
+];
+const bottomSamples = [
+  { url: sampleBottom1, name: "示例下装 1" },
+  { url: sampleBottom2, name: "示例下装 2" },
+  { url: sampleBottom3, name: "示例下装 3" },
 ];
 
 // 比例选项：w/h 为示意小图标的像素尺寸（自动无图标）
@@ -148,7 +174,7 @@ function AssetEmpty() {
   );
 }
 
-function UploadPanel({ title, badge, action, thumbs, icon, muted = false, value, onSelect, onClear }) {
+function UploadPanel({ title, badge, action, samples, icon, muted = false, value, onSelect, onSelectSample, onClear }) {
   const inputRef = useRef(null);
 
   function openPicker() {
@@ -198,10 +224,18 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false, value,
             <button type="button" onClick={openPicker}>
               {action.replace("图片", "")}
             </button>
-            <small>没有图片?</small>
+            <small>没有图片? 点下方示例试试</small>
             <div className="thumb-row">
-              {thumbs.map((thumb) => (
-                <PhotoTile key={thumb} className={thumb} label="" />
+              {samples.map((sample) => (
+                <button
+                  className="thumb-sample"
+                  key={sample.url}
+                  type="button"
+                  onClick={() => onSelectSample(sample)}
+                  aria-label={`使用${sample.name}`}
+                >
+                  <img src={sample.url} alt={sample.name} />
+                </button>
               ))}
             </div>
           </>
@@ -214,26 +248,30 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false, value,
 function useUploadSlot() {
   const [value, setValue] = useState(null);
 
+  // 替换当前值，并释放上一张本地上传产生的 blob（示例图是静态资源，blob 为 null 不释放）
+  function replaceWith(next) {
+    setValue((prev) => {
+      if (prev?.blob) {
+        URL.revokeObjectURL(prev.blob);
+      }
+      return next;
+    });
+  }
+
   function onSelect(file) {
     const url = URL.createObjectURL(file);
-    setValue((prev) => {
-      if (prev) {
-        URL.revokeObjectURL(prev.url);
-      }
-      return { url, name: file.name };
-    });
+    replaceWith({ url, name: file.name, blob: url });
+  }
+
+  function onSelectSample(sample) {
+    replaceWith({ url: sample.url, name: sample.name, blob: null });
   }
 
   function onClear() {
-    setValue((prev) => {
-      if (prev) {
-        URL.revokeObjectURL(prev.url);
-      }
-      return null;
-    });
+    replaceWith(null);
   }
 
-  return { value, onSelect, onClear };
+  return { value, onSelect, onSelectSample, onClear };
 }
 
 export default function Home() {
@@ -309,9 +347,10 @@ export default function Home() {
               badge="必选"
               action="添加人物"
               icon={<PersonAddIcon />}
-              thumbs={["portrait-one", "portrait-two", "portrait-three"]}
+              samples={personSamples}
               value={person.value}
               onSelect={person.onSelect}
+              onSelectSample={person.onSelectSample}
               onClear={person.onClear}
             />
             <UploadPanel
@@ -319,9 +358,10 @@ export default function Home() {
               badge="必选"
               action="添加主服装"
               icon={<ShirtIcon />}
-              thumbs={["cloth-one", "cloth-two", "cloth-three"]}
+              samples={topSamples}
               value={mainCloth.value}
               onSelect={mainCloth.onSelect}
+              onSelectSample={mainCloth.onSelectSample}
               onClear={mainCloth.onClear}
             />
             <UploadPanel
@@ -329,10 +369,11 @@ export default function Home() {
               badge="可选"
               action="添加下装"
               icon={<ImageAddIcon />}
-              thumbs={["pants-one", "pants-two", "pants-three"]}
+              samples={bottomSamples}
               muted
               value={bottom.value}
               onSelect={bottom.onSelect}
+              onSelectSample={bottom.onSelectSample}
               onClear={bottom.onClear}
             />
           </aside>

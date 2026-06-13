@@ -32,3 +32,6 @@ frontend/.env
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# 收图素材原图（大体积，仅本地处理用，不入库）
+incoming-photos/
