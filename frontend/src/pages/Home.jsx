@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import commerceAfterImage from "../assets/commerce-after.jpg";
 import commerceBeforeImage from "../assets/commerce-before.jpg";
@@ -102,19 +102,8 @@ function ImageAddIcon() {
   );
 }
 
-function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
+function UploadPanel({ title, badge, action, thumbs, icon, muted = false, value, onSelect, onClear }) {
   const inputRef = useRef(null);
-  const [preview, setPreview] = useState(null);
-  const [fileName, setFileName] = useState("");
-
-  useEffect(
-    () => () => {
-      if (preview) {
-        URL.revokeObjectURL(preview);
-      }
-    },
-    [preview]
-  );
 
   function openPicker() {
     inputRef.current?.click();
@@ -125,15 +114,9 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
     if (!file) {
       return;
     }
-    setPreview(URL.createObjectURL(file));
-    setFileName(file.name);
+    onSelect(file);
     // 清空 value，确保再次选择同一文件也能触发 change
     event.target.value = "";
-  }
-
-  function clearImage() {
-    setPreview(null);
-    setFileName("");
   }
 
   return (
@@ -142,7 +125,7 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
         <h3>{title}</h3>
         <span>{badge}</span>
       </div>
-      <div className={`upload-box ${preview ? "has-preview" : ""}`}>
+      <div className={`upload-box ${value ? "has-preview" : ""}`}>
         <input
           ref={inputRef}
           type="file"
@@ -150,13 +133,13 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
           hidden
           onChange={handleFileChange}
         />
-        {preview ? (
+        {value ? (
           <div className="upload-filled">
-            <img src={preview} alt={`${title}预览`} />
+            <img src={value.url} alt={`${title}预览`} />
             <button
               type="button"
               className="upload-clear"
-              onClick={clearImage}
+              onClick={onClear}
               aria-label="移除图片"
             >
               ×
@@ -169,7 +152,7 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
             <button type="button" onClick={openPicker}>
               {action.replace("图片", "")}
             </button>
-            <small>{fileName || "没有图片?"}</small>
+            <small>没有图片?</small>
             <div className="thumb-row">
               {thumbs.map((thumb) => (
                 <PhotoTile key={thumb} className={thumb} label="" />
@@ -182,7 +165,36 @@ function UploadPanel({ title, badge, action, thumbs, icon, muted = false }) {
   );
 }
 
+function useUploadSlot() {
+  const [value, setValue] = useState(null);
+
+  function onSelect(file) {
+    const url = URL.createObjectURL(file);
+    setValue((prev) => {
+      if (prev) {
+        URL.revokeObjectURL(prev.url);
+      }
+      return { url, name: file.name };
+    });
+  }
+
+  function onClear() {
+    setValue((prev) => {
+      if (prev) {
+        URL.revokeObjectURL(prev.url);
+      }
+      return null;
+    });
+  }
+
+  return { value, onSelect, onClear };
+}
+
 export default function Home() {
+  const person = useUploadSlot();
+  const mainCloth = useUploadSlot();
+  const bottom = useUploadSlot();
+
   return (
     <main className="landing-page">
       <section className="hero-section" id="try-on">
@@ -244,6 +256,9 @@ export default function Home() {
               action="添加人物"
               icon={<PersonAddIcon />}
               thumbs={["portrait-one", "portrait-two", "portrait-three"]}
+              value={person.value}
+              onSelect={person.onSelect}
+              onClear={person.onClear}
             />
             <UploadPanel
               title="主服装图"
@@ -251,6 +266,9 @@ export default function Home() {
               action="添加主服装"
               icon={<ShirtIcon />}
               thumbs={["cloth-one", "cloth-two", "cloth-three"]}
+              value={mainCloth.value}
+              onSelect={mainCloth.onSelect}
+              onClear={mainCloth.onClear}
             />
             <UploadPanel
               title="下装图"
@@ -259,6 +277,9 @@ export default function Home() {
               icon={<ImageAddIcon />}
               thumbs={["pants-one", "pants-two", "pants-three"]}
               muted
+              value={bottom.value}
+              onSelect={bottom.onSelect}
+              onClear={bottom.onClear}
             />
           </aside>
 
@@ -274,8 +295,8 @@ export default function Home() {
                   <span>试穿前</span>
                   <PhotoTile
                     className="portrait-dark"
-                    image={stageBeforeImage}
-                    alt="试穿前：白色衬衫人物照"
+                    image={person.value ? person.value.url : stageBeforeImage}
+                    alt="试穿前：人物照"
                     showLabel={false}
                   />
                 </article>
@@ -293,14 +314,23 @@ export default function Home() {
             </div>
             <div className="preview-assets">
               <article>
-                <PhotoTile className="cloth-one" label="" />
+                <PhotoTile
+                  className="cloth-one"
+                  image={mainCloth.value ? mainCloth.value.url : undefined}
+                  label=""
+                  showLabel={false}
+                />
                 <h3>主服装图</h3>
-                <p>示例预览中使用的衣服</p>
+                <p>{mainCloth.value ? "已上传的主服装" : "示例预览中使用的衣服"}</p>
               </article>
               <article>
-                <span className="empty-icon">▱</span>
+                {bottom.value ? (
+                  <PhotoTile className="pants-one" image={bottom.value.url} label="" showLabel={false} />
+                ) : (
+                  <span className="empty-icon">▱</span>
+                )}
                 <h3>下装图</h3>
-                <p>示例预览未展示可选单品</p>
+                <p>{bottom.value ? "已上传的下装" : "示例预览未展示可选单品"}</p>
               </article>
             </div>
           </section>

@@ -371,26 +371,29 @@ button {
   width: 100%;
 }
 
-.upload-clear {
+.upload-box .upload-clear {
   align-items: center;
-  background: rgba(60, 64, 60, 0.55);
+  background: rgba(28, 32, 28, 0.5);
   border: 0;
   border-radius: 999px;
   color: #fff;
   cursor: pointer;
   display: inline-flex;
-  font-size: 22px;
-  height: 38px;
+  font-size: 16px;
+  height: 28px;
   justify-content: center;
   line-height: 1;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
   position: absolute;
-  right: 12px;
-  top: 12px;
-  width: 38px;
+  right: 10px;
+  top: 10px;
+  width: 28px;
 }
 
-.upload-clear:hover {
-  background: rgba(40, 44, 40, 0.72);
+.upload-box .upload-clear:hover {
+  background: rgba(18, 22, 18, 0.7);
 }
 
 .upload-box button {
