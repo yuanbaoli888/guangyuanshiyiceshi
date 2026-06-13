@@ -8,6 +8,8 @@ import fashionAfterImage from "../assets/fashion-after.jpg";
 import fashionBeforeImage from "../assets/fashion-before.jpg";
 import personAfterImage from "../assets/tryon-person-after.jpg";
 import personBeforeImage from "../assets/tryon-person-before.jpg";
+import stageAfterImage from "../assets/stage-after.jpg";
+import stageBeforeImage from "../assets/stage-before.jpg";
 
 const styleCards = [
   ["原生风格", "最接近原图", "portrait-one"],
@@ -216,6 +218,7 @@ export default function Home() {
   const [size, setSize] = useState("1K");
 
   const ready = Boolean(person.value && mainCloth.value);
+  const hasAnyUpload = Boolean(person.value || mainCloth.value || bottom.value);
   const styleLabel = styleCards[styleIndex][0];
 
   return (
@@ -313,7 +316,8 @@ export default function Home() {
                 <button type="button">预览</button>
                 <button type="button">{size} 输出</button>
               </div>
-              <div className="stage-ready">
+              {hasAnyUpload ? (
+                <div className="stage-ready">
                 <div className="stage-ready-head">
                   <div>
                     <h3>{ready ? "素材已准备好" : "准备素材"}</h3>
@@ -363,7 +367,30 @@ export default function Home() {
                     <p>{bottom.value ? "本次生成使用了这个可选槽位" : "可选，未上传"}</p>
                   </article>
                 </div>
-              </div>
+                </div>
+              ) : (
+                <div className="before-after">
+                  <article>
+                    <span>试穿前</span>
+                    <PhotoTile
+                      className="portrait-dark"
+                      image={stageBeforeImage}
+                      alt="试穿前：白色衬衫人物照"
+                      showLabel={false}
+                    />
+                  </article>
+                  <div className="stage-divider" />
+                  <article>
+                    <span>试穿后</span>
+                    <PhotoTile
+                      className="portrait-light"
+                      image={stageAfterImage}
+                      alt="试穿后：蓝白条纹上衣效果"
+                      showLabel={false}
+                    />
+                  </article>
+                </div>
+              )}
             </div>
             <div className="preview-assets">
               <article>
