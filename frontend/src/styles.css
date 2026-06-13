@@ -713,6 +713,10 @@ button {
   width: 78px;
 }
 
+.style-grid .photo-tile-img {
+  object-position: 50% 18%;
+}
+
 .style-grid .selected,
 .ratio-grid .selected,
 .size-grid .selected,

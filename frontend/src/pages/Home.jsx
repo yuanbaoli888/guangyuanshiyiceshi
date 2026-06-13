@@ -19,12 +19,15 @@ import sampleTop2 from "../assets/sample-top-2.jpg";
 import sampleTop3 from "../assets/sample-top-3.jpg";
 import stageAfterImage from "../assets/stage-after.jpg";
 import stageBeforeImage from "../assets/stage-before.jpg";
+import styleCommerceImage from "../assets/style-commerce.jpg";
+import styleDailyImage from "../assets/style-daily.jpg";
+import styleNativeImage from "../assets/style-native.jpg";
 
 const styleCards = [
-  ["原生风格", "最接近原图", "portrait-one"],
-  ["日常真实", "自然细节", "portrait-two"],
-  ["电商展示", "突出商品", "portrait-three"],
-  ["时尚大片", "更强氛围", "portrait-four"],
+  ["原生风格", "最接近原图", styleNativeImage],
+  ["日常真实", "自然细节", styleDailyImage],
+  ["电商展示", "突出商品", styleCommerceImage],
+  ["时尚大片", "更强氛围", samplePerson2],
 ];
 
 // 各面板的示例图库：没有自己照片的访客可一键载入
@@ -484,14 +487,14 @@ export default function Home() {
             <section className="settings-card">
               <h3>风格</h3>
               <div className="style-grid">
-                {styleCards.map(([title, text, imageClass], index) => (
+                {styleCards.map(([title, text, image], index) => (
                   <button
                     className={index === styleIndex ? "selected" : ""}
                     key={title}
                     type="button"
                     onClick={() => setStyleIndex(index)}
                   >
-                    <PhotoTile className={imageClass} label="" />
+                    <PhotoTile className="style-thumb" image={image} alt={title} label="" showLabel={false} />
                     <strong>{title}</strong>
                     <small>{text}</small>
                   </button>
