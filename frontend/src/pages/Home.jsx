@@ -8,14 +8,29 @@ import fashionAfterImage from "../assets/fashion-after.jpg";
 import fashionBeforeImage from "../assets/fashion-before.jpg";
 import personAfterImage from "../assets/tryon-person-after.jpg";
 import personBeforeImage from "../assets/tryon-person-before.jpg";
-import stageAfterImage from "../assets/stage-after.jpg";
-import stageBeforeImage from "../assets/stage-before.jpg";
 
 const styleCards = [
   ["原生风格", "最接近原图", "portrait-one"],
   ["日常真实", "自然细节", "portrait-two"],
   ["电商展示", "突出商品", "portrait-three"],
   ["时尚大片", "更强氛围", "portrait-four"],
+];
+
+// 比例选项：w/h 为示意小图标的像素尺寸（自动无图标）
+const ratioOptions = [
+  { label: "自动", w: 0, h: 0 },
+  { label: "1:1", w: 22, h: 22 },
+  { label: "3:4", w: 18, h: 24 },
+  { label: "4:3", w: 24, h: 18 },
+  { label: "9:16", w: 14, h: 24 },
+  { label: "16:9", w: 24, h: 14 },
+];
+
+// 尺寸选项：2K/4K 需登录或升级，暂锁定（后续接 API 再解锁）
+const sizeOptions = [
+  { label: "1K", note: "极速 2 积分", locked: false },
+  { label: "2K", note: "2 积分", locked: true },
+  { label: "4K", note: "未解锁 升级", locked: true },
 ];
 
 const featureCards = [
@@ -195,6 +210,14 @@ export default function Home() {
   const mainCloth = useUploadSlot();
   const bottom = useUploadSlot();
 
+  const [styleIndex, setStyleIndex] = useState(0);
+  const [focus, setFocus] = useState("服装");
+  const [ratio, setRatio] = useState("自动");
+  const [size, setSize] = useState("1K");
+
+  const ready = Boolean(person.value && mainCloth.value);
+  const styleLabel = styleCards[styleIndex][0];
+
   return (
     <main className="landing-page">
       <section className="hero-section" id="try-on">
@@ -288,28 +311,58 @@ export default function Home() {
             <div className="preview-stage">
               <div className="stage-actions">
                 <button type="button">预览</button>
-                <button type="button">1K 输出</button>
+                <button type="button">{size} 输出</button>
               </div>
-              <div className="before-after">
-                <article>
-                  <span>试穿前</span>
-                  <PhotoTile
-                    className="portrait-dark"
-                    image={person.value ? person.value.url : stageBeforeImage}
-                    alt="试穿前：人物照"
-                    showLabel={false}
-                  />
-                </article>
-                <div className="stage-divider" />
-                <article>
-                  <span>试穿后</span>
-                  <PhotoTile
-                    className="portrait-light"
-                    image={stageAfterImage}
-                    alt="试穿后：蓝白条纹上衣效果"
-                    showLabel={false}
-                  />
-                </article>
+              <div className="stage-ready">
+                <div className="stage-ready-head">
+                  <div>
+                    <h3>{ready ? "素材已准备好" : "准备素材"}</h3>
+                    <p>
+                      {ready
+                        ? "人物照和主服装图已选好，现在可以生成试衣结果。"
+                        : "请先上传人物照和主服装图，下装为可选项。"}
+                    </p>
+                  </div>
+                  <div className="stage-tags">
+                    <span>{styleLabel}</span>
+                    <span>{size} 输出</span>
+                  </div>
+                </div>
+                <div className="material-cards">
+                  <article>
+                    <div className="material-thumb">
+                      {person.value ? (
+                        <img src={person.value.url} alt="人物照" />
+                      ) : (
+                        <span className="empty-icon">＋</span>
+                      )}
+                    </div>
+                    <h4>人物照</h4>
+                    <p>{person.value ? "已选用于本次生成" : "必选，待上传"}</p>
+                  </article>
+                  <article>
+                    <div className="material-thumb">
+                      {mainCloth.value ? (
+                        <img src={mainCloth.value.url} alt="主服装图" />
+                      ) : (
+                        <span className="empty-icon">＋</span>
+                      )}
+                    </div>
+                    <h4>主服装图</h4>
+                    <p>{mainCloth.value ? "已选用于本次生成" : "必选，待上传"}</p>
+                  </article>
+                  <article>
+                    <div className="material-thumb">
+                      {bottom.value ? (
+                        <img src={bottom.value.url} alt="下装图" />
+                      ) : (
+                        <span className="empty-icon">＋</span>
+                      )}
+                    </div>
+                    <h4>下装图</h4>
+                    <p>{bottom.value ? "本次生成使用了这个可选槽位" : "可选，未上传"}</p>
+                  </article>
+                </div>
               </div>
             </div>
             <div className="preview-assets">
@@ -321,7 +374,7 @@ export default function Home() {
                   showLabel={false}
                 />
                 <h3>主服装图</h3>
-                <p>{mainCloth.value ? "已上传的主服装" : "示例预览中使用的衣服"}</p>
+                <p>{mainCloth.value ? "已选用于本次生成" : "示例预览中使用的衣服"}</p>
               </article>
               <article>
                 {bottom.value ? (
@@ -330,7 +383,7 @@ export default function Home() {
                   <span className="empty-icon">▱</span>
                 )}
                 <h3>下装图</h3>
-                <p>{bottom.value ? "已上传的下装" : "示例预览未展示可选单品"}</p>
+                <p>{bottom.value ? "本次生成使用了这个可选槽位" : "示例预览未展示可选单品"}</p>
               </article>
             </div>
           </section>
@@ -341,7 +394,12 @@ export default function Home() {
               <h3>风格</h3>
               <div className="style-grid">
                 {styleCards.map(([title, text, imageClass], index) => (
-                  <button className={index === 0 ? "selected" : ""} key={title} type="button">
+                  <button
+                    className={index === styleIndex ? "selected" : ""}
+                    key={title}
+                    type="button"
+                    onClick={() => setStyleIndex(index)}
+                  >
                     <PhotoTile className={imageClass} label="" />
                     <strong>{title}</strong>
                     <small>{text}</small>
@@ -353,36 +411,48 @@ export default function Home() {
               <h3>设置</h3>
               <p>关注点</p>
               <div className="segmented">
-                <button className="selected" type="button">
-                  服装
-                </button>
-                <button type="button">我</button>
+                {["服装", "我"].map((option) => (
+                  <button
+                    className={focus === option ? "selected" : ""}
+                    key={option}
+                    type="button"
+                    onClick={() => setFocus(option)}
+                  >
+                    {option}
+                  </button>
+                ))}
               </div>
               <p>比例</p>
               <div className="ratio-grid">
-                {["自动", "1:1", "3:4", "4:3", "9:16", "16:9"].map((ratio, index) => (
-                  <button className={index === 0 ? "selected" : ""} key={ratio} type="button">
-                    {ratio}
+                {ratioOptions.map(({ label, w, h }) => (
+                  <button
+                    className={ratio === label ? "selected" : ""}
+                    key={label}
+                    type="button"
+                    onClick={() => setRatio(label)}
+                  >
+                    {w ? <span className="ratio-shape" style={{ width: w, height: h }} /> : null}
+                    <span>{label}</span>
                   </button>
                 ))}
               </div>
               <p>尺寸</p>
               <div className="size-grid">
-                <button className="selected" type="button">
-                  <strong>1K</strong>
-                  <small>极速 2 积分</small>
-                </button>
-                <button disabled type="button">
-                  <strong>2K</strong>
-                  <small>2 积分</small>
-                </button>
-                <button disabled type="button">
-                  <strong>4K</strong>
-                  <small>未解锁 升级</small>
-                </button>
+                {sizeOptions.map(({ label, note, locked }) => (
+                  <button
+                    className={size === label ? "selected" : ""}
+                    disabled={locked}
+                    key={label}
+                    type="button"
+                    onClick={() => setSize(label)}
+                  >
+                    <strong>{label}</strong>
+                    <small>{note}</small>
+                  </button>
+                ))}
               </div>
-              <small>自动比例仅支持 1K。</small>
-              <button className="generate-button" type="button">
+              <small>登录后解锁 2K，升级解锁 4K。</small>
+              <button className="generate-button" type="button" disabled={!ready}>
                 ⌁ 一键试衣
               </button>
             </section>
