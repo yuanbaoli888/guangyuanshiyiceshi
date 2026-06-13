@@ -117,6 +117,7 @@ export default function Home() {
             image={commerceBeforeImage}
             hoverImage={commerceAfterImage}
             alt="电商展示风格人物照"
+            showLabel={false}
           />
           <PhotoTile
             className="portrait-four"
