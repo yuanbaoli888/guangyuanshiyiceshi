@@ -1,3 +1,6 @@
+import personAfterImage from "../assets/tryon-person-after.jpg";
+import personBeforeImage from "../assets/tryon-person-before.jpg";
+
 const styleCards = [
   ["原生风格", "最接近原图", "portrait-one"],
   ["日常真实", "自然细节", "portrait-two"],
@@ -29,9 +32,18 @@ const faqItems = [
   "也可以用 AnyTryOn 给照片换衣服吗?",
 ];
 
-function PhotoTile({ className = "", label }) {
+function PhotoTile({ className = "", label, image, hoverImage, alt }) {
+  const imageClass = image ? "photo-tile-image" : "";
+  const hoverClass = hoverImage ? "photo-tile-hover-swap" : "";
+
   return (
-    <div className={`photo-tile ${className}`}>
+    <div className={`photo-tile ${imageClass} ${hoverClass} ${className}`}>
+      {image ? (
+        <img className="photo-tile-img photo-tile-img-default" src={image} alt={alt || label} />
+      ) : null}
+      {hoverImage ? (
+        <img className="photo-tile-img photo-tile-img-hover" src={hoverImage} alt="" aria-hidden="true" />
+      ) : null}
       <span>{label}</span>
     </div>
   );
@@ -77,7 +89,13 @@ export default function Home() {
           </a>
         </div>
         <div className="hero-collage" aria-label="虚拟试穿示例">
-          <PhotoTile className="portrait-one" label="人物照" />
+          <PhotoTile
+            className="portrait-one"
+            label="人物照"
+            image={personBeforeImage}
+            hoverImage={personAfterImage}
+            alt="金发女性人物照"
+          />
           <PhotoTile className="portrait-two" label="日常真实" />
           <PhotoTile className="portrait-three" label="电商展示" />
           <PhotoTile className="portrait-four" label="时尚大片" />

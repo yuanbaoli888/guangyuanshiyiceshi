@@ -1052,6 +1052,48 @@ button {
   width: 26%;
 }
 
+.photo-tile-image {
+  background: #f7f3ec;
+}
+
+.photo-tile-image::before,
+.photo-tile-image::after {
+  display: none;
+}
+
+.photo-tile-img {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  transition:
+    opacity 260ms ease,
+    transform 520ms ease;
+  width: 100%;
+}
+
+.photo-tile-img-hover {
+  opacity: 0;
+}
+
+.portrait-one.photo-tile-image .photo-tile-img-default {
+  object-position: 50% 32%;
+}
+
+.portrait-one.photo-tile-image .photo-tile-img-hover {
+  object-position: 50% 18%;
+}
+
+.photo-tile-hover-swap:hover .photo-tile-img-default {
+  opacity: 0;
+  transform: scale(1.03);
+}
+
+.photo-tile-hover-swap:hover .photo-tile-img-hover {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
 .photo-tile span {
   background: rgba(36, 54, 45, 0.48);
   border-radius: 999px;
