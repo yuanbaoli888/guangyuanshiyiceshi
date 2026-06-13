@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import auth, health, users
+from app.api.routes import auth, health, tryon, users
 from app.core.config import settings
 from app.core.logging import configure_logging
 
@@ -56,6 +56,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router, tags=["health"])
     app.include_router(auth.router, prefix="/auth", tags=["auth"])
     app.include_router(users.router, prefix="/users", tags=["users"])
+    app.include_router(tryon.router, prefix="/tryon", tags=["tryon"])
 
     return app
 

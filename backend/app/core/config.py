@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     db_path: str = "./app.db"
     backend_cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
+    # AI 图像编辑（虚拟试穿）平台，OpenAI 兼容
+    ai_api_base_url: str = ""
+    ai_api_key: str = ""
+    ai_model_2k: str = "nano-banana-2-2k"
+    ai_model_4k: str = "nano-banana-2-4k"
+
     @cached_property
     def database_url(self) -> str:
         if self.db_path.startswith("sqlite:///"):
