@@ -38,7 +38,7 @@ const faqItems = [
   "也可以用 光原TryOn 给照片换衣服吗?",
 ];
 
-function PhotoTile({ className = "", label, image, hoverImage, alt }) {
+function PhotoTile({ className = "", label, image, hoverImage, alt, showLabel = true }) {
   const imageClass = image ? "photo-tile-image" : "";
   const hoverClass = hoverImage ? "photo-tile-hover-swap" : "";
 
@@ -50,7 +50,7 @@ function PhotoTile({ className = "", label, image, hoverImage, alt }) {
       {hoverImage ? (
         <img className="photo-tile-img photo-tile-img-hover" src={hoverImage} alt="" aria-hidden="true" />
       ) : null}
-      <span>{label}</span>
+      {showLabel && label ? <span>{label}</span> : null}
     </div>
   );
 }
@@ -101,6 +101,7 @@ export default function Home() {
             image={personBeforeImage}
             hoverImage={personAfterImage}
             alt="金发女性人物照"
+            showLabel={false}
           />
           <PhotoTile
             className="portrait-two"
