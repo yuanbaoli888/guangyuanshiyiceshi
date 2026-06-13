@@ -1,181 +1,156 @@
 # AI Handoff - 项目交接说明
 
-这份文档用于在新开 Codex/AI 对话时快速恢复上下文。新对话开始后，先让 AI 阅读本文件，再继续开发。
+这份文档用于在新开 AI 对话时快速恢复上下文。**新对话开始后，先让 AI 读本文件，再继续。**
 
 ## 新窗口建议开场白
 
-请先阅读项目根目录的 `AI_HANDOFF.md`，了解当前项目状态、技术栈、运行方式、Git 规则和下一步计划。读完后先总结你理解到的项目现状，再继续根据我的新需求开发。
+> 请先阅读项目根目录的 `AI_HANDOFF.md`，了解项目现状、技术栈、虚拟试穿是怎么实现的、如何换模型、运行方式和 Git 规则。读完先用中文总结你理解到的现状，再继续我的新需求。
 
-## 项目当前目标
+---
 
-这个项目最初是一个 `FastAPI + React + SQLite` 全栈认证脚手架，现在正在往一个名为 `光原TryOn`（Guangyuan TryOn）的在线虚拟试穿产品页面方向演进。
+## 一、项目是什么
 
-当前优先目标：
+`光原TryOn`（Guangyuan TryOn）——一个**在线虚拟试穿**网页产品。用户上传人物照 + 服装图，点「一键试衣」，AI 把衣服穿到人物身上并返回效果图。
+项目最初是一个全栈认证脚手架，现已演进为带**真实可用试衣功能**的产品页。
 
-- 首页 UI 第一版已完成（对照用户截图），目前以静态展示为主。
-- Hero 区图片素材已替换为真实图片，并加了 hover 切换效果。
-- 后续重点：继续微调视觉细节、把上传/预览/按钮做成可交互、接入真实试穿逻辑。
-
-## 当前技术栈
+## 二、技术栈
 
 - 前端：React + Vite + React Router
-- 后端：Python + FastAPI
-- 数据库：SQLite
-- 迁移：Alembic
-- 认证：JWT + bcrypt
+- 后端：Python + FastAPI（SQLite + Alembic + JWT/bcrypt 的认证脚手架仍在）
+- AI 能力：调用**第三方图像编辑大模型**（当前是 vveai 聚合站的 `nano-banana`），不是自己训练的模型
 
-## 当前代码状态
+---
 
-当前分支：`main`
+## 三、★ 虚拟试穿是怎么实现的（核心，换模型必读）
 
-最近重要提交（`main` 顶部，新到旧）：
+### 调用链路
+前端「一键试衣」→ 把 人物图/主服装图/下装图 压缩成 jpeg base64（`toJpegDataUrl`，最长边 1536）
+→ `POST /tryon/generate`（JSON）→ 后端拼提示词、调模型 → **同步返回结果图 URL** → 前端在"试穿后"展示 + 下载。
 
-- `7658f3c / 8be6836 / 4bf8184 / 09d4052 Hide hero tile labels`
-  - 隐藏 Hero 拼贴四格上的文字标签（fashion / commerce / daily / person）。
-- `294dec7 Rename brand to Guangyuan TryOn`
-  - 品牌从 `AnyTryOn` 统一改名为 `光原TryOn`（全站文案、品牌标、footer、版权）。
-- `a757d26 Add hover swaps for hero style tiles`
-  - Hero 风格卡片增加 hover 切换图（鼠标悬停时 before → after）。
-- `f02fddb Remove cookie choice card`
-  - 移除首页早期的 Cookie 选择卡片。
-- 更早：`a9cf134 Build AnyTryOn landing page`（首页第一版）、`5b4c2ff Initial fullstack auth scaffold`（初始认证脚手架）。
+### 当前用的模型/平台
+- 平台：**vveai**（`https://api.vveai.com`），**OpenAI 兼容**聚合站。
+- 接口：`POST {base}/v1/chat/completions`，多模态 `messages`（一段 text 提示词 + 两/三张 `image_url` 的 base64 data URI）。
+- 模型：`nano-banana-2-2k` / `nano-banana-2-4k`（实际解析到 `gemini-3.x-flash-image`）。
+- 返回：结果图是 `choices[0].message.content` 里的 **markdown 图片链接** `![image](https://...jpg)`，解析 URL 即可。
+- 同步返回（约 10–30s），约 0.5 元/张。`restore_face` 类能力使人脸保持较好。
 
-当前工作区在写入本文件前是干净状态。
+### 唯一的"模型集成点"——`backend/app/services/tryon.py`
+所有与模型相关的逻辑**只在这一个文件**：
+- `_build_prompt(...)`：**提示词模板**（含 `STYLE_HINTS` / `FOCUS_HINTS`），按是否有上/下装、关注点、比例拼接。改提示词只动这里。
+- `_model_for_size(size)`：`4K → ai_model_4k`，其余 `→ ai_model_2k`。
+- `generate_tryon(person_image, top_image, bottom_image, style, focus, ratio, size) -> 结果图URL`：组请求、调接口、`_extract_image_url` 解析返回。
 
-## 已完成内容
+路由 `backend/app/api/routes/tryon.py` 和前端都只依赖 `generate_tryon` 的"输入图+参数 → 返回图URL"这个契约，**换模型时它们通常不用改**。
 
-### 后端
+### ★ 如何换成其他模型 / 平台
+按改动大小分三种：
+1. **同平台换模型**（最简单）：改 `backend/.env` 里的 `AI_MODEL_2K` / `AI_MODEL_4K`。
+   - 要求新模型是**图像编辑类**（能"输入图片+提示词→输出图片"），不能是纯文生图。
+2. **换平台但仍是 OpenAI 兼容、chat/completions 返回图**：改 `.env` 的 `AI_API_BASE_URL` + `AI_API_KEY`（+模型名）。若返回格式不同，改 `tryon.py` 里的 `_extract_image_url`。
+3. **接口形态不同**（例如要求公网图片 URL、用 `/v1/images/edits` multipart、或异步任务轮询）：**只重写 `tryon.py` 里的 `generate_tryon`**（保持函数签名/返回 URL 不变），路由和前端不动。
+   - 注意坑：有的模型（如阿里云 AITryOn）**只接受公网 URL、不收 base64**，那就需要先把上传图存到对象存储（OSS/COS）拿到 URL——这会多一步，且当前项目没做存储。
 
-后端仍是初始认证脚手架，**尚未新增任何试穿（tryon）接口**：
+---
 
-- `/health`
-- `/auth/register`、`/auth/login`、`/auth/logout`、`/auth/me`
-- `/users` 用户接口（列表 / me / 按 id 查 / 改 / 删）
-- SQLite 数据库配置
-- Alembic 迁移
+## 四、目录与关键文件
 
-路由挂载见 `backend/app/main.py`（`health` / `auth` / `users` 三个 router）。
+### 后端 `backend/`
+- `app/main.py`：挂载 4 个 router —— `health` / `auth`(`/auth`) / `users`(`/users`) / **`tryon`(`/tryon`)**。
+- `app/api/routes/tryon.py`：`POST /tryon/generate`。请求体 `TryonRequest`（`person_image` 必填，`top_image`/`bottom_image` 至少一个，外加 `style/focus/ratio/size`，都是 data URI 或 http URL）；校验失败 400，模型出错 502；成功返回 `{ "image_url": ... }`。
+- `app/services/tryon.py`：见上一节（模型集成点 + 提示词）。
+- `app/core/config.py`：pydantic `Settings`，新增字段 `ai_api_base_url / ai_api_key / ai_model_2k / ai_model_4k`，从 `backend/.env` 读。
+- 认证脚手架接口不变：`/health`、`/auth/*`、`/users/*`。
 
-### 前端
+### 前端 `frontend/src/`
+- `pages/Home.jsx`：首页全部内容（约 600 行）。
+- `App.jsx`：顶栏导航 + 路由。
+- `shared/api.js`：`apiRequest` + `generateTryon(payload)`。
+- `styles.css`：全部样式。
+- `assets/`：图片素材。命名约定：
+  - Hero/示例：`commerce/daily/fashion/tryon-person` 各 before/after；`stage-before/after`（中间预览默认示例）。
+  - 上传面板示例图库：`sample-person-1..3`、`sample-top-1..3`、`sample-bottom-1..3`。
 
-当前首页是 `光原TryOn` landing page，主要文件：
+### 工作区（首页核心交互区，`#workspace`）
+- **左列：3 个上传面板**（人物照必选 / 主服装图必选 / 下装图可选）。每个面板：
+  - 点「添加…」→ 弹系统选图 → 选中后**大图预览 + 右上角 ✕ 移除**；
+  - 下方「没有图片?」处有**3 张可点击示例图**（悬停放大、点击一键载入，等价于上传）。
+  - 受控状态由 `useUploadSlot` 管理（上传产生 blob 会 `revokeObjectURL`，示例图是静态资源不释放）。
+- **中列：深色预览台**，按状态切换：
+  1. 有结果 → 「试穿前(人物)/试穿后(结果)」+「下载 / 查看大图」；
+  2. 生成中 → loading 转圈；
+  3. 上传了任意图 → 「素材已准备好 / 准备素材」+ 人物/主服装/下装三张素材卡；
+  4. 都没传 → 默认示例对比图（`stage-before/after`）。
+  下方还有「主服装图 / 下装图」两张资产卡（没传显示"未使用"层叠图标）。
+- **右列：设置卡**（已精简）：`关注点(服装/我)` + `尺寸(2K/4K)` + `一键试衣`。
+  - **注意：早期的「风格」「比例」模块已按用户要求删除**；比例固定走"自动"。
+  - `尺寸` 直接关联模型：2K→`nano-banana-2-2k`，4K→`nano-banana-2-4k`。
 
-- `frontend/src/App.jsx`（顶栏导航 + 路由 + 品牌点击回顶）
-- `frontend/src/pages/Home.jsx`（首页全部区块，约 400 行）
-- `frontend/src/styles.css`（约 1400 行样式）
-- `frontend/src/assets/`（真实图片素材：commerce / daily / fashion / tryon-person 各有 before + after，共 8 张）
+---
 
-顶部导航（在 `App.jsx`）：品牌 `光`/`光原TryOn`、`使用指南`、`常见问题`、`试穿`、`定价`、语言选择、登录/控制台/退出按钮（按登录态切换）。
+## 五、密钥与配置（`backend/.env`，已被 git 忽略）
 
-首页区块（按 `Home.jsx` 顺序）：
-
-- Hero（`#try-on`）：标题 `在线虚拟 试穿 工具` + 右侧四格拼贴，已用真实图，**hover 时 before → after 切换**，四格文字标签已隐藏。
-- 虚拟试穿工作区（`#workspace`）：
-  - 左：人物照（必选）、主服装图（必选）、下装图（可选）上传面板
-  - 中：试穿前/试穿后预览、主服装图/下装图素材
-  - 右：风格选择、关注点、比例、尺寸、`一键试衣`
-- `先试穿，再决定穿什么`
-- `为什么先做虚拟试穿`（有无虚拟试穿对比）
-- `如何用 光原TryOn 在线试穿衣服`（`#guide`，三步）
-- `需要更具体的试穿场景？`（`#pricing`，场景卡片）
-- FAQ（`#faq`，折叠列表，答案为占位文案）
-- 底部 CTA
-- Footer
-- 右下角悬浮工具按钮
-
-注意：Hero 四格已是真实图片；工作区内部分缩略图（cloth/pants/portrait 等）仍是 CSS 占位块，FAQ 答案也仍是占位文案。早期的 Cookie 选择卡片已移除。
-
-## 启动方式
-
-项目根目录：
-
-```powershell
-E:\iwen-codex\项目实战测试
 ```
+AI_API_BASE_URL=https://api.vveai.com
+AI_API_KEY=sk-...        # 用户自己的 key，不入库、不进前端、别贴聊天
+AI_MODEL_2K=nano-banana-2-2k
+AI_MODEL_4K=nano-banana-2-4k
+```
+（另有 SECRET_KEY 等脚手架变量。`backend/.env.example` 是模板。）
 
-后端：
+其它说明：
+- `incoming-photos/`：用户收集的大图原图（~18MB/张），**已 gitignore**，仅本地用；压缩后的小图才进 `assets/`。
+- `backend/.venv` 里装了 **Pillow**，仅用于本地把大图压成 jpg（不是 App 运行依赖）。
+
+---
+
+## 六、运行 & 验证
 
 ```powershell
-cd backend
+# 后端（在 backend 目录）
 .venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-前端：
-
-```powershell
-cd frontend
+# 前端（在 frontend 目录）
 npx vite --host 0.0.0.0 --port 5173
 ```
+- 前端：`http://localhost:5173`；后端健康检查：`http://127.0.0.1:8000/health`
+- 前端默认连 `http://localhost:8000`（可用 `VITE_API_URL` 覆盖）。
 
-访问地址：
+验证：前端 `npm run lint` + `npm run build`；后端 `.venv\Scripts\python.exe -m compileall app`。
 
-- 前端：`http://localhost:5173`
-- 后端健康检查：`http://127.0.0.1:8000/health`
+---
 
-## 验证命令
+## 七、Git 规则（用户固定要求）
 
-前端：
-
-```powershell
-cd frontend
-npm run lint
-npm run build
-```
-
-后端：
-
-```powershell
-cd backend
-.venv\Scripts\python.exe -m compileall app
-```
-
-## 用户的固定协作规则
-
-用户要求：
-
-- 以后只要 AI 修改、添加、删除代码或项目文件，都要执行：
-  - `git add`
-  - `git commit`
+- 只要 AI 改/加/删代码或文件，都要 `git add` + `git commit`。
 - 不要随意丢弃用户改动。
-- 如果要回滚、reset、删除分支等危险操作，必须先确认。
+- 危险操作（`reset` / 回滚 / 删分支 / `--force` 等）**必须先确认**。
+- 分支：`main`。
 
-## Git 操作历史提醒
-
-用户已经学习并操作过：
-
-- `git init`
-- `git add`
-- `git commit`
-- 分支：`main`、`master`、曾经有 `text`
-- 删除分支
-- 切换分支
-- `git revert`
-- `git reset --hard`
-
-用户曾要求用：
-
-```powershell
-git reset --hard 5b4c2ff
+### 当前代码状态（顶部提交，新→旧）
 ```
+fc627c5 Remove style/ratio controls, keep 2K/4K size selection
+7a699bd Wire one-click try-on generation in frontend
+cfeffd4 Add virtual try-on backend endpoint via vveai
+5f21067 Use real photos for style preset cards
+9159155 Add clickable sample image gallery to upload panels
+355f1b1 Add local image upload to workspace panels
+5c47c49 Show before/after photos in workspace preview stage
+```
+写本文件前工作区为干净状态。
 
-回到初始脚手架，然后又重新做了首页（即现在的 `光原TryOn` landing page）。
+---
 
-## 下一步建议
+## 八、已知限制 / 可做的下一步
 
-优先下一步可以做：
+- **比例精确化**：目前比例只是提示词、且选择器已删，实际不保证输出比例。要 1:1/16:9 精确出图需生成后裁剪/扩图。
+- **下载**：现在是新标签打开模型返回的远程图（链接会过期），未做后端代理强制下载/落地保存。
+- **无积分/限流**：UI 上的"积分"是占位，没有真实扣费、防刷。
+- **无结果历史**：结果只是临时 URL，未存数据库/对象存储。
+- **认证未与试衣打通**：`/tryon/generate` 目前不校验登录。
+- 效果依赖所选模型：**换模型后务必拿真实图实测**人脸还原、衣服花纹是否够准。
 
-1. 对照用户截图继续微调首页视觉细节。
-2. 替换工作区内剩余的占位缩略图（Hero 四格已用真实图，此项部分完成）。
-3. 把登录按钮、开始虚拟试穿按钮和工作区交互串起来。
-4. 做上传图片预览逻辑。
-5. 补全 FAQ 折叠项的真实答案文案。
-6. 后端新增试穿任务 API 草案，例如 `/tryon/jobs`（目前后端无任何 tryon 接口）。
-7. 后续再接入真实 AI 图片生成服务。
+## 九、给新 AI 的注意事项
 
-## 给新 AI 的注意事项
-
-- 先读代码，不要假设当前状态。
-- 首页当前是静态 UI 第一版，不是最终产品。
-- 图片占位是临时方案。
-- 用户更关心“能看见完整页面”和“Git 可回滚”，不要一次性做太大不可控重构。
-- 回复用户时尽量用中文，解释要清楚、直接。
+- 先读代码、读本文件，不要假设状态。
+- 换模型只动 `backend/app/services/tryon.py` + `backend/.env`，别动路由/前端契约。
+- 用户重视"能看见完整页面""Git 可回滚"，不要一次做太大不可控重构；每步小改、跑通、提交。
+- 回复用中文，清楚、直接。
