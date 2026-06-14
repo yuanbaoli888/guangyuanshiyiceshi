@@ -13,6 +13,14 @@
 `光原TryOn`（Guangyuan TryOn）——一个**在线虚拟试穿**网页产品。用户上传人物照 + 服装图，点「一键试衣」，AI 把衣服穿到人物身上并返回效果图。
 项目最初是一个全栈认证脚手架，现已演进为带**真实可用试衣功能**的产品页。
 
+### 当前存储点（2026-06-14）
+- GitHub 仓库：`https://github.com/yuanbaoli888/guangyuanshiyiceshi`
+- 分支：`main`
+- 当前顶部提交：`904dc20 Add hover-driven decision previews`
+- 本地 `main` 已跟踪 `origin/main`，当前项目已整体推送到 GitHub。
+- 继续开发时：先 `git pull` 同步远程，再小步修改、验证、提交、`git push`。
+- 注意：`backend/.env`、API Key、`incoming-photos/` 原图、`.claude/` 本地配置不作为项目代码上传。
+
 ## 二、技术栈
 
 - 前端：React + Vite + React Router
@@ -69,6 +77,7 @@
 - `assets/`：图片素材。命名约定：
   - Hero/示例：`commerce/daily/fashion/tryon-person` 各 before/after；`stage-before/after`（中间预览默认示例）。
   - 上传面板示例图库：`sample-person-1..3`、`sample-top-1..3`、`sample-bottom-1..3`。
+  - 决策区 hover 预览：`decision-buy-*`、`decision-compare-*`、`decision-share-*`，每组包含 before/after 两张压缩 JPG。
 
 ### 工作区（首页核心交互区，`#workspace`）
 - **左列：3 个上传面板**（人物照必选 / 主服装图必选 / 下装图可选）。每个面板：
@@ -84,6 +93,13 @@
 - **右列：设置卡**（已精简）：`关注点(服装/我)` + `尺寸(2K/4K)` + `一键试衣`。
   - **注意：早期的「风格」「比例」模块已按用户要求删除**；比例固定走"自动"。
   - `尺寸` 直接关联模型：2K→`nano-banana-2-2k`，4K→`nano-banana-2-4k`。
+
+### 决策区（`先试穿，再决定穿什么`）
+- 左侧 3 张权益卡：`购买前预览` / `比较穿搭` / `分享预览`。
+- 标签前已添加小图标：`购买更安心` / `更多选择` / `无水印下载`。
+- 卡片有 hover/focus 触感：轻微上浮、阴影增强、边框变暖。
+- 鼠标移到不同卡片时，右侧预览区同步切换对应 before/after 图片，底部胶囊标题同步切换。
+- 这部分只影响静态展示，不影响真实试衣接口和模型调用。
 
 ---
 
@@ -127,15 +143,15 @@ npx vite --host 0.0.0.0 --port 5173
 
 ### 当前代码状态（顶部提交，新→旧）
 ```
+904dc20 Add hover-driven decision previews
+37cbefb Add feature card icons and hover states
+b83da71 Update AI_HANDOFF with try-on integration and model-swap guide
 fc627c5 Remove style/ratio controls, keep 2K/4K size selection
 7a699bd Wire one-click try-on generation in frontend
 cfeffd4 Add virtual try-on backend endpoint via vveai
 5f21067 Use real photos for style preset cards
-9159155 Add clickable sample image gallery to upload panels
-355f1b1 Add local image upload to workspace panels
-5c47c49 Show before/after photos in workspace preview stage
 ```
-写本文件前工作区为干净状态。
+写本存储点时：代码已推送到 GitHub；工作区只剩本地未跟踪 `.claude/`，不属于项目提交内容。
 
 ---
 
@@ -154,3 +170,13 @@ cfeffd4 Add virtual try-on backend endpoint via vveai
 - 换模型只动 `backend/app/services/tryon.py` + `backend/.env`，别动路由/前端契约。
 - 用户重视"能看见完整页面""Git 可回滚"，不要一次做太大不可控重构；每步小改、跑通、提交。
 - 回复用中文，清楚、直接。
+
+## 十、以后换模型 / 更新数据的操作流程
+
+1. 先同步：`git pull`。
+2. 如果只是换同平台模型：改 `backend/.env` 的 `AI_MODEL_2K` / `AI_MODEL_4K`，不提交 `.env`。
+3. 如果换 OpenAI 兼容平台：改 `backend/.env` 的 `AI_API_BASE_URL` / `AI_API_KEY` / 模型名；如返回格式不同，再改 `backend/app/services/tryon.py` 的 `_extract_image_url`。
+4. 如果新模型接口形态不同：只重写 `backend/app/services/tryon.py` 的 `generate_tryon`，保持函数签名和返回 URL 契约不变。
+5. 新增展示图片时：原图先放 `incoming-photos/` 本地处理，压缩后的 JPG/PNG 再放 `frontend/src/assets/` 入库。
+6. 每次修改后验证：前端 `npm run lint` + `npm run build`；后端如有改动跑 `.venv\Scripts\python.exe -m compileall app`。
+7. 验证通过后：`git add` + `git commit` + `git push`，让 GitHub 保存最新版本。
