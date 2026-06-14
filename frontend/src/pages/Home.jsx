@@ -5,6 +5,12 @@ import commerceAfterImage from "../assets/commerce-after.jpg";
 import commerceBeforeImage from "../assets/commerce-before.jpg";
 import dailyAfterImage from "../assets/daily-after.jpg";
 import dailyBeforeImage from "../assets/daily-before.jpg";
+import decisionBuyAfterImage from "../assets/decision-buy-after.jpg";
+import decisionBuyBeforeImage from "../assets/decision-buy-before.jpg";
+import decisionCompareAfterImage from "../assets/decision-compare-after.jpg";
+import decisionCompareBeforeImage from "../assets/decision-compare-before.jpg";
+import decisionShareAfterImage from "../assets/decision-share-after.jpg";
+import decisionShareBeforeImage from "../assets/decision-share-before.jpg";
 import fashionAfterImage from "../assets/fashion-after.jpg";
 import fashionBeforeImage from "../assets/fashion-before.jpg";
 import personAfterImage from "../assets/tryon-person-after.jpg";
@@ -50,18 +56,24 @@ const featureCards = [
     text: "把衣服预览到自己的照片上，下单、退换或比较款式前先看效果。",
     tag: "购买更安心",
     icon: <SparkleTagIcon />,
+    beforeImage: decisionBuyBeforeImage,
+    afterImage: decisionBuyAfterImage,
   },
   {
     title: "比较穿搭",
     text: "在同一张人物照上尝试不同服装和风格，再决定最终造型。",
     tag: "更多选择",
     icon: <StoreTagIcon />,
+    beforeImage: decisionCompareBeforeImage,
+    afterImage: decisionCompareAfterImage,
   },
   {
     title: "分享预览",
     text: "下载无水印结果，用来展示一套穿搭想法。",
     tag: "无水印下载",
     icon: <ToolsTagIcon />,
+    beforeImage: decisionShareBeforeImage,
+    afterImage: decisionShareAfterImage,
   },
 ];
 
@@ -332,9 +344,11 @@ export default function Home() {
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState(null);
   const [genError, setGenError] = useState("");
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
 
   const ready = Boolean(person.value && mainCloth.value);
   const hasAnyUpload = Boolean(person.value || mainCloth.value || bottom.value);
+  const activeFeature = featureCards[activeFeatureIndex];
 
   async function handleGenerate() {
     if (!ready || generating) {
@@ -637,7 +651,13 @@ export default function Home() {
         <div className="decision-grid">
           <div className="value-stack">
             {featureCards.map(({ title, text, tag, icon }, index) => (
-              <article className={index === 0 ? "active" : ""} key={title}>
+              <article
+                className={index === activeFeatureIndex ? "active" : ""}
+                key={title}
+                onFocus={() => setActiveFeatureIndex(index)}
+                onMouseEnter={() => setActiveFeatureIndex(index)}
+                tabIndex={0}
+              >
                 <span className="feature-tag">
                   {icon}
                   {tag}
@@ -648,9 +668,21 @@ export default function Home() {
             ))}
           </div>
           <div className="stacked-preview">
-            <PhotoTile className="portrait-before" label="试穿前" />
-            <PhotoTile className="portrait-after" label="试穿后" />
-            <span>购买前预览</span>
+            <PhotoTile
+              className="portrait-before"
+              image={activeFeature.beforeImage}
+              key={`${activeFeature.title}-before`}
+              label="试穿前"
+              alt={`${activeFeature.title}试穿前`}
+            />
+            <PhotoTile
+              className="portrait-after"
+              image={activeFeature.afterImage}
+              key={`${activeFeature.title}-after`}
+              label="试穿后"
+              alt={`${activeFeature.title}试穿后`}
+            />
+            <span>{activeFeature.title}</span>
           </div>
         </div>
       </section>

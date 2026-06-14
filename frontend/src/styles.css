@@ -896,7 +896,7 @@ button {
 
 .value-stack article {
   border-radius: 34px;
-  cursor: default;
+  cursor: pointer;
   min-height: 190px;
   padding: 38px;
   transition:
@@ -908,11 +908,14 @@ button {
 
 .value-stack article.active {
   border-color: rgba(201, 121, 98, 0.36);
+  box-shadow: 0 18px 42px rgba(36, 54, 45, 0.1);
 }
 
-.value-stack article:hover {
+.value-stack article:hover,
+.value-stack article:focus-visible {
   border-color: rgba(201, 121, 98, 0.34);
   box-shadow: 0 22px 48px rgba(36, 54, 45, 0.13);
+  outline: none;
   transform: translateY(-8px);
 }
 
@@ -939,7 +942,8 @@ button {
   width: 20px;
 }
 
-.value-stack article:hover .feature-tag {
+.value-stack article:hover .feature-tag,
+.value-stack article:focus-visible .feature-tag {
   box-shadow: 0 12px 24px rgba(36, 54, 45, 0.13);
   color: var(--ink);
   transform: translateY(-2px);
@@ -970,6 +974,7 @@ button {
 }
 
 .stacked-preview .photo-tile {
+  animation: preview-card-in 260ms ease both;
   height: 520px;
   position: absolute;
   top: 115px;
@@ -997,6 +1002,18 @@ button {
   left: 72px;
   padding: 12px 24px;
   position: absolute;
+}
+
+@keyframes preview-card-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
 
 .compare-grid {
