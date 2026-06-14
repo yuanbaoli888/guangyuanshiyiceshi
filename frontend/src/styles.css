@@ -896,23 +896,53 @@ button {
 
 .value-stack article {
   border-radius: 34px;
+  cursor: default;
   min-height: 190px;
   padding: 38px;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+  will-change: transform;
 }
 
 .value-stack article.active {
   border-color: rgba(201, 121, 98, 0.36);
 }
 
-.value-stack span,
+.value-stack article:hover {
+  border-color: rgba(201, 121, 98, 0.34);
+  box-shadow: 0 22px 48px rgba(36, 54, 45, 0.13);
+  transform: translateY(-8px);
+}
+
+.value-stack .feature-tag,
 .compare-grid span {
+  align-items: center;
   background: #fff;
   border-radius: 999px;
   box-shadow: 0 7px 16px rgba(36, 54, 45, 0.08);
   color: #7d857e;
-  display: inline-block;
+  display: inline-flex;
   font-weight: 900;
+  gap: 8px;
   padding: 9px 18px;
+  transition:
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.value-stack .feature-tag svg {
+  height: 20px;
+  stroke-width: 2.35;
+  width: 20px;
+}
+
+.value-stack article:hover .feature-tag {
+  box-shadow: 0 12px 24px rgba(36, 54, 45, 0.13);
+  color: var(--ink);
+  transform: translateY(-2px);
 }
 
 .value-stack h3,

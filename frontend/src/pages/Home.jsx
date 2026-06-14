@@ -45,9 +45,24 @@ const sizeOptions = [
 ];
 
 const featureCards = [
-  ["购买前预览", "把衣服预览到自己的照片上，下单、退换或比较款式前先看效果。", "购买更安心"],
-  ["比较穿搭", "在同一张人物照上尝试不同服装和风格，再决定最终造型。", "更多选择"],
-  ["分享预览", "下载无水印结果，用来展示一套穿搭想法。", "无水印下载"],
+  {
+    title: "购买前预览",
+    text: "把衣服预览到自己的照片上，下单、退换或比较款式前先看效果。",
+    tag: "购买更安心",
+    icon: <SparkleTagIcon />,
+  },
+  {
+    title: "比较穿搭",
+    text: "在同一张人物照上尝试不同服装和风格，再决定最终造型。",
+    tag: "更多选择",
+    icon: <StoreTagIcon />,
+  },
+  {
+    title: "分享预览",
+    text: "下载无水印结果，用来展示一套穿搭想法。",
+    tag: "无水印下载",
+    icon: <ToolsTagIcon />,
+  },
 ];
 
 const scenarioCards = [
@@ -124,6 +139,41 @@ function ImageAddIcon() {
       <line x1="19" x2="19" y1="2" y2="8" />
       <circle cx="9" cy="9" r="2" />
       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+    </svg>
+  );
+}
+
+function SparkleTagIcon() {
+  return (
+    <svg {...iconProps} width="20" height="20" viewBox="0 0 24 24">
+      <path d="M11 4 9.7 8.3 6 10l3.7 1.7L11 16l1.3-4.3L16 10l-3.7-1.7Z" />
+      <path d="M18 12.5 17.2 15 15 16l2.2 1 0.8 2.5 0.8-2.5 2.2-1-2.2-1Z" />
+      <path d="M5 3v4" />
+      <path d="M3 5h4" />
+    </svg>
+  );
+}
+
+function StoreTagIcon() {
+  return (
+    <svg {...iconProps} width="20" height="20" viewBox="0 0 24 24">
+      <path d="M4 10h16" />
+      <path d="M5 10l1-5h12l1 5" />
+      <path d="M6 10v9h12v-9" />
+      <path d="M9 19v-5h6v5" />
+      <path d="M4 10a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0" />
+    </svg>
+  );
+}
+
+function ToolsTagIcon() {
+  return (
+    <svg {...iconProps} width="20" height="20" viewBox="0 0 24 24">
+      <path d="m14.7 6.3 3 3" />
+      <path d="m7.5 14.5-3 3a2.1 2.1 0 0 0 3 3l3-3" />
+      <path d="m16.5 4.5 3 3-12 12-3-3Z" />
+      <path d="m4 8 3-3" />
+      <path d="m5.5 3.5 3 3" />
     </svg>
   );
 }
@@ -586,9 +636,12 @@ export default function Home() {
         </div>
         <div className="decision-grid">
           <div className="value-stack">
-            {featureCards.map(([title, text, tag], index) => (
+            {featureCards.map(({ title, text, tag, icon }, index) => (
               <article className={index === 0 ? "active" : ""} key={title}>
-                <span>{tag}</span>
+                <span className="feature-tag">
+                  {icon}
+                  {tag}
+                </span>
                 <h3>{title}</h3>
                 <p>{text}</p>
               </article>
