@@ -16,7 +16,7 @@
 ### 当前存储点（2026-06-14）
 - GitHub 仓库：`https://github.com/yuanbaoli888/guangyuanshiyiceshi`
 - 分支：`main`
-- 当前顶部提交：`904dc20 Add hover-driven decision previews`
+- 当前顶部提交：`77a54f7 Store current project handoff state`
 - 本地 `main` 已跟踪 `origin/main`，当前项目已整体推送到 GitHub。
 - 继续开发时：先 `git pull` 同步远程，再小步修改、验证、提交、`git push`。
 - 注意：`backend/.env`、API Key、`incoming-photos/` 原图、`.claude/` 本地配置不作为项目代码上传。
@@ -143,6 +143,7 @@ npx vite --host 0.0.0.0 --port 5173
 
 ### 当前代码状态（顶部提交，新→旧）
 ```
+77a54f7 Store current project handoff state
 904dc20 Add hover-driven decision previews
 37cbefb Add feature card icons and hover states
 b83da71 Update AI_HANDOFF with try-on integration and model-swap guide
