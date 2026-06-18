@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { generateTryon } from "../shared/api.js";
+import { useAuth } from "../shared/useAuth.js";
 import commerceAfterImage from "../assets/commerce-after.jpg";
 import commerceBeforeImage from "../assets/commerce-before.jpg";
 import dailyAfterImage from "../assets/daily-after.jpg";
@@ -104,12 +106,12 @@ const faqItems = [
   {
     question: "需要登录吗？积分和清晰度怎么算?",
     answer:
-      "不登录也能免费试 1 次 1K。首次真实登录固定赠送 2 积分，并解锁 2K 与历史保存；升级 Pro 解锁 4K。登录后积分消耗：1K=2、2K=2、4K=4（生成失败会退回）。",
+      "需要登录后才能使用一键试衣。首次真实登录固定赠送 2 积分，并解锁 2K 与历史保存；升级 Pro 解锁 4K。登录后积分消耗：1K=2、2K=2、4K=4（生成失败会退回）。",
   },
   {
     question: "我的照片安全吗?",
     answer:
-      "你的上传与结果都存放在私有存储里，只能通过短期签名链接访问。匿名生成用订单号查看，请把它当作私密链接。登录后结果会出现在历史里，你可以随时删除。",
+      "你的上传与结果都存放在私有存储里，只能通过短期签名链接访问。结果会出现在登录后的历史里，你可以随时删除。",
   },
   {
     question: "可以下载并用于商用吗?",
@@ -118,7 +120,7 @@ const faqItems = [
   },
   {
     question: "光原TryOn 是免费的虚拟试穿工具吗?",
-    answer: "是的，不登录也能免费试 1 次 1K。首次真实登录固定赠送 2 积分，可用更高清并保存更多历史。",
+    answer: "是的，注册登录后会固定赠送 2 积分，可先体验 1K/2K 生成，也可以升级使用 4K。",
   },
   {
     question: "也可以用 光原TryOn 给照片换衣服吗?",
@@ -366,6 +368,7 @@ function useUploadSlot() {
 }
 
 export default function Home() {
+  const { token, loading: authLoading } = useAuth();
   const person = useUploadSlot();
   const mainCloth = useUploadSlot();
   const bottom = useUploadSlot();
@@ -379,11 +382,12 @@ export default function Home() {
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
 
   const ready = Boolean(person.value && mainCloth.value);
+  const canGenerate = Boolean(token && ready && !authLoading && !generating);
   const hasAnyUpload = Boolean(person.value || mainCloth.value || bottom.value);
   const activeFeature = featureCards[activeFeatureIndex];
 
   async function handleGenerate() {
-    if (!ready || generating) {
+    if (!canGenerate) {
       return;
     }
     setGenerating(true);
@@ -395,13 +399,16 @@ export default function Home() {
         toJpegDataUrl(mainCloth.value.url),
         bottom.value ? toJpegDataUrl(bottom.value.url) : Promise.resolve(null),
       ]);
-      const res = await generateTryon({
-        person_image: personImg,
-        top_image: topImg,
-        bottom_image: bottomImg,
-        focus,
-        size,
-      });
+      const res = await generateTryon(
+        {
+          person_image: personImg,
+          top_image: topImg,
+          bottom_image: bottomImg,
+          focus,
+          size,
+        },
+        token,
+      );
       setResult(res.image_url);
     } catch (e) {
       setGenError(e.message || "生成失败，请重试");
@@ -420,7 +427,7 @@ export default function Home() {
             工具
           </h1>
           <p>
-            光原TryOn 是免费的在线虚拟试穿工具：上传人物照和服装图，在购买或决定穿搭前预览上身效果。首次生成无需登录且免费，下载结果无水印。
+            光原TryOn 是免费的在线虚拟试穿工具：注册登录后上传人物照和服装图，在购买或决定穿搭前预览上身效果，下载结果无水印。
           </p>
           <a className="dark-cta" href="#workspace">
             开始虚拟试穿 <span aria-hidden="true">⌁</span>
@@ -663,12 +670,18 @@ export default function Home() {
               <button
                 className="generate-button"
                 type="button"
-                disabled={!ready || generating}
+                disabled={!canGenerate}
                 onClick={handleGenerate}
               >
-                {generating ? "生成中…" : "⌁ 一键试衣"}
+                {generating ? "生成中…" : token ? "⌁ 一键试衣" : "登录后试衣"}
               </button>
-              {!ready && <small className="gen-hint">请先放好人物照和主服装图。</small>}
+              {!token ? (
+                <small className="gen-hint">
+                  请先 <Link to="/login">登录</Link> 或 <Link to="/register">注册</Link>，登录后才能使用一键试衣。
+                </small>
+              ) : !ready ? (
+                <small className="gen-hint">请先放好人物照和主服装图。</small>
+              ) : null}
               {genError && <small className="gen-error">{genError}</small>}
             </section>
           </aside>

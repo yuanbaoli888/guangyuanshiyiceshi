@@ -28,9 +28,10 @@ export async function apiRequest(path, { token, ...options } = {}) {
 }
 
 // 调用后端虚拟试穿接口，payload 里图片为 data URI
-export async function generateTryon(payload) {
+export async function generateTryon(payload, token) {
   return apiRequest("/tryon/generate", {
     method: "POST",
+    token,
     body: JSON.stringify(payload),
   });
 }

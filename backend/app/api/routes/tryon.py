@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from app.api.deps import get_current_user
+from app.models.user import User
 from app.services.tryon import generate_tryon
 
 router = APIRouter()
@@ -21,7 +23,10 @@ class TryonResponse(BaseModel):
 
 
 @router.post("/generate", response_model=TryonResponse)
-def generate(payload: TryonRequest) -> TryonResponse:
+def generate(
+    payload: TryonRequest,
+    _current_user: User = Depends(get_current_user),
+) -> TryonResponse:
     if not payload.top_image and not payload.bottom_image:
         raise HTTPException(status_code=400, detail="至少需要一件服装（主服装或下装）")
     try:
