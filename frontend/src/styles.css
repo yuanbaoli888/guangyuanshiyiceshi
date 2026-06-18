@@ -1080,12 +1080,33 @@ button {
 
 .guide-section {
   background:
-    linear-gradient(rgba(31, 51, 40, 0.92), rgba(31, 51, 40, 0.92)),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.18), transparent 32%);
+    radial-gradient(circle at 18% 10%, rgba(231, 237, 222, 0.12), transparent 26%),
+    radial-gradient(circle at 76% 42%, rgba(144, 167, 144, 0.14), transparent 28%),
+    linear-gradient(135deg, rgba(31, 51, 40, 0.98), rgba(35, 58, 45, 0.96)),
+    #203628;
   color: #fff;
   margin-top: 130px;
   max-width: none;
+  overflow: hidden;
   padding: 130px 28px 150px;
+  position: relative;
+}
+
+.guide-section::before {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 42px 42px;
+  content: "";
+  inset: 0;
+  opacity: 0.45;
+  pointer-events: none;
+  position: absolute;
+}
+
+.guide-section > * {
+  position: relative;
+  z-index: 1;
 }
 
 .guide-section .section-heading {
@@ -1098,19 +1119,84 @@ button {
 
 .step-grid {
   display: grid;
-  gap: 34px;
+  gap: 46px;
   grid-template-columns: repeat(3, 1fr);
   margin: 90px auto 0;
-  max-width: 1260px;
+  max-width: 1320px;
+  position: relative;
+}
+
+.step-grid::before {
+  border-top: 1px dashed rgba(255, 255, 255, 0.18);
+  content: "";
+  left: 16%;
+  position: absolute;
+  right: 16%;
+  top: 82px;
 }
 
 .step-grid article {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 34px;
-  min-height: 290px;
-  padding: 56px 48px;
+  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 36px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 22px 58px rgba(13, 27, 19, 0.22);
+  min-height: 315px;
+  overflow: hidden;
+  padding: 64px 50px 54px;
+  position: relative;
   text-align: center;
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+  will-change: transform;
+}
+
+.step-grid article::before {
+  background: rgba(24, 42, 31, 0.5);
+  content: "";
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 240ms ease;
+  z-index: 1;
+}
+
+.step-grid article:hover,
+.step-grid article:focus-within {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 30px 76px rgba(11, 24, 17, 0.3);
+  transform: translateY(-10px);
+}
+
+.step-grid article:hover::before,
+.step-grid article:focus-within::before {
+  opacity: 1;
+}
+
+.step-card-image {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  opacity: 0;
+  position: absolute;
+  transform: scale(1.05);
+  transition:
+    opacity 260ms ease,
+    transform 520ms ease;
+  width: 100%;
+}
+
+.step-grid article:hover .step-card-image,
+.step-grid article:focus-within .step-card-image {
+  opacity: 0.42;
+  transform: scale(1);
 }
 
 .step-grid span {
@@ -1123,7 +1209,9 @@ button {
   height: 72px;
   justify-content: center;
   margin-bottom: 38px;
+  position: relative;
   width: 72px;
+  z-index: 2;
 }
 
 .step-grid h3 {
@@ -1131,11 +1219,20 @@ button {
   font-size: 30px;
   font-weight: 400;
   margin: 0 0 18px;
+  position: relative;
+  z-index: 2;
 }
 
 .step-grid p {
   color: rgba(255, 255, 255, 0.62);
   margin: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.step-grid article:hover p,
+.step-grid article:focus-within p {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .scenario-grid {
@@ -1691,6 +1788,10 @@ th {
   .step-grid,
   .footer-grid {
     grid-template-columns: 1fr;
+  }
+
+  .step-grid::before {
+    display: none;
   }
 
   .stacked-preview {

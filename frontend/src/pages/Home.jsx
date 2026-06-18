@@ -13,6 +13,9 @@ import decisionShareAfterImage from "../assets/decision-share-after.jpg";
 import decisionShareBeforeImage from "../assets/decision-share-before.jpg";
 import fashionAfterImage from "../assets/fashion-after.jpg";
 import fashionBeforeImage from "../assets/fashion-before.jpg";
+import guideStep1Image from "../assets/guide-step-1.webp";
+import guideStep2Image from "../assets/guide-step-2.webp";
+import guideStep3Image from "../assets/guide-step-3.webp";
 import personAfterImage from "../assets/tryon-person-after.jpg";
 import personBeforeImage from "../assets/tryon-person-before.jpg";
 import sampleBottom1 from "../assets/sample-bottom-1.jpg";
@@ -722,16 +725,19 @@ export default function Home() {
         </div>
         <div className="step-grid">
           <article>
+            <img className="step-card-image" src={guideStep1Image} alt="" aria-hidden="true" />
             <span>1</span>
             <h3>上传人物照</h3>
             <p>上传一张清晰的人物照片，可以是你自己、模特或商品主体，它会成为虚拟试穿的基础。</p>
           </article>
           <article>
+            <img className="step-card-image" src={guideStep2Image} alt="" aria-hidden="true" />
             <span>2</span>
             <h3>上传衣服图</h3>
             <p>上传你想预览的服装。正面、干净、光线好的服装图，更容易得到自然效果。</p>
           </article>
           <article>
+            <img className="step-card-image" src={guideStep3Image} alt="" aria-hidden="true" />
             <span>3</span>
             <h3>生成并下载</h3>
             <p>选择风格和关注点，生成试穿预览，然后用于购买或穿搭决策。</p>
