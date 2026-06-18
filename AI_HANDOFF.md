@@ -64,8 +64,9 @@
 
 ### 后端 `backend/`
 - `app/main.py`：挂载 4 个 router —— `health` / `auth`(`/auth`) / `users`(`/users`) / **`tryon`(`/tryon`)**。
-- `app/api/routes/tryon.py`：`POST /tryon/generate`。请求体 `TryonRequest`（`person_image` 必填，`top_image`/`bottom_image` 至少一个，外加 `style/focus/ratio/size`，都是 data URI 或 http URL）；校验失败 400，模型出错 502；成功返回 `{ "image_url": ... }`。
+- `app/api/routes/tryon.py`：`POST /tryon/generate`。请求体 `TryonRequest`（`person_image` 必填，`top_image`/`bottom_image` 至少一个，外加 `style/focus/ratio/size`，都是 data URI 或 http URL）；校验失败 400，模型出错 502；成功返回 `{ "image_url": ..., "job_id": ... }`。另有 `GET /tryon/jobs` 和 `GET /tryon/jobs/{job_id}`，用于查询当前登录用户自己的试衣任务记录。
 - `app/services/tryon.py`：见上一节（模型集成点 + 提示词）。
+- `app/services/tryon_jobs.py`：试衣任务编排层。当前仍同步调用模型，但会先创建 `tryon_jobs`，生成中标记 `processing`，成功写 `assets` 结果图并标记 `succeeded`，失败写错误信息并标记 `failed`。
 - `app/core/config.py`：pydantic `Settings`，新增字段 `ai_api_base_url / ai_api_key / ai_model_2k / ai_model_4k`，从 `backend/.env` 读。
 - 认证脚手架接口不变：`/health`、`/auth/*`、`/users/*`。
 
@@ -74,7 +75,7 @@
 - `app/models/tryon_job.py`：`tryon_jobs` 生成任务表，准备记录每次试衣的素材、状态、模型名、提示词快照、失败原因和积分成本。
 - `app/models/billing.py`：`credit_accounts` 积分账户表 + `credit_transactions` 积分流水表，准备支持赠送、消费、退款和对账。
 - `migrations/versions/20260618_0001_product_foundation.py`：新增以上真实项目地基表；迁移已接到 `0001_create_users` 后面，`0001_create_users` 也做了表存在时跳过，便于兼容已有本地库。
-- 注意：这些表目前只是产品化地基，现有一键试衣接口仍是同步生成；下一步再逐步接入任务表、积分扣费、图片落库和历史记录。
+- 注意：现有一键试衣接口仍是同步生成，但已经会落 `tryon_jobs` 和结果 `assets`。积分扣费/失败退款尚未启用，预留在 `app/services/tryon_jobs.py` 的 `reserve_tryon_credits(...)` 和 `refund_tryon_credits(...)`。
 
 ### 前端 `frontend/src/`
 - `pages/Home.jsx`：首页全部内容（约 600 行）。
@@ -167,8 +168,8 @@ cfeffd4 Add virtual try-on backend endpoint via vveai
 
 - **比例精确化**：目前比例只是提示词、且选择器已删，实际不保证输出比例。要 1:1/16:9 精确出图需生成后裁剪/扩图。
 - **下载**：现在是新标签打开模型返回的远程图（链接会过期），未做后端代理强制下载/落地保存。
-- **积分/限流未接入业务流**：已建 `credit_accounts` / `credit_transactions` 表，但还没有真实扣费、防刷和失败退款。
-- **结果历史未接入业务流**：已建 `tryon_jobs` / `assets` 表，但现有结果仍只是临时 URL，尚未存对象存储或落历史记录。
+- **积分/限流未接入业务流**：已建 `credit_accounts` / `credit_transactions` 表，并在 `tryon_jobs.py` 预留扣费/退款 hook，但还没有真实扣费、防刷和失败退款规则。
+- **结果历史部分接入业务流**：已建 `tryon_jobs` / `assets` 表，并且生成接口会落任务和结果资产；但结果仍只是第三方临时 URL，尚未存对象存储。
 - **认证已与试衣打通**：`/tryon/generate` 已要求登录；未登录前端按钮会引导登录/注册。
 - 效果依赖所选模型：**换模型后务必拿真实图实测**人脸还原、衣服花纹是否够准。
 

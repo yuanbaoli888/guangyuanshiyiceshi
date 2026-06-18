@@ -66,6 +66,22 @@ def _model_for_size(size: str) -> str:
     return settings.ai_model_2k
 
 
+def describe_tryon_request(
+    *,
+    has_top: bool,
+    has_bottom: bool,
+    style: str,
+    focus: str,
+    ratio: str,
+    size: str,
+) -> tuple[str, str]:
+    """Return the model and prompt snapshot used for a generation request."""
+    return (
+        _model_for_size(size),
+        _build_prompt(has_top=has_top, has_bottom=has_bottom, style=style, focus=focus, ratio=ratio),
+    )
+
+
 def _extract_image_url(content: str) -> str | None:
     """从返回内容里解析结果图 URL（markdown 链接或裸 URL）。"""
     m = re.search(r"!\[[^\]]*\]\((https?://[^\s)]+)\)", content)
