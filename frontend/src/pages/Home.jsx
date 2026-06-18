@@ -88,14 +88,43 @@ const scenarioCards = [
 ];
 
 const faqItems = [
-  "什么是虚拟试穿?",
-  "需要上传什么?",
-  "“风格”和“关注点”是什么?",
-  "需要登录吗？积分和清晰度怎么算?",
-  "我的照片安全吗?",
-  "可以下载并用于商用吗?",
-  "光原TryOn 是免费的虚拟试穿工具吗?",
-  "也可以用 光原TryOn 给照片换衣服吗?",
+  {
+    question: "什么是虚拟试穿?",
+    answer:
+      "虚拟试穿可以在购买、搭配、上架或拍摄前，把服装预览到人物照片上。光原TryOn 使用 AI 根据你上传的人物照和服装图生成可下载的真实试穿预览。",
+  },
+  {
+    question: "需要上传什么?",
+    answer: "一张清晰的人物照 + 服装图。上衣必选，下装可选。光线干净、主体无遮挡，效果更稳定。",
+  },
+  {
+    question: "“风格”和“关注点”是什么?",
+    answer: "风格决定整体质感（原生风格 / 日常 / 电商 / 大片）。关注点决定优化方向：服装更清晰，或更像你本人。",
+  },
+  {
+    question: "需要登录吗？积分和清晰度怎么算?",
+    answer:
+      "不登录也能免费试 1 次 1K。首次真实登录固定赠送 2 积分，并解锁 2K 与历史保存；升级 Pro 解锁 4K。登录后积分消耗：1K=2、2K=2、4K=4（生成失败会退回）。",
+  },
+  {
+    question: "我的照片安全吗?",
+    answer:
+      "你的上传与结果都存放在私有存储里，只能通过短期签名链接访问。匿名生成用订单号查看，请把它当作私密链接。登录后结果会出现在历史里，你可以随时删除。",
+  },
+  {
+    question: "可以下载并用于商用吗?",
+    answer:
+      "可以。下载结果无水印，可用于个人或商业项目；请确保你上传的人物照与衣服图具备合法授权/版权。",
+  },
+  {
+    question: "光原TryOn 是免费的虚拟试穿工具吗?",
+    answer: "是的，不登录也能免费试 1 次 1K。首次真实登录固定赠送 2 积分，可用更高清并保存更多历史。",
+  },
+  {
+    question: "也可以用 光原TryOn 给照片换衣服吗?",
+    answer:
+      "可以。首页是更通用的虚拟试穿工作区；如果你的需求是明确给照片换装，AI 换装工具页面会更贴近这个意图。",
+  },
 ];
 
 function PhotoTile({ className = "", label, image, hoverImage, alt, showLabel = true }) {
@@ -772,13 +801,13 @@ export default function Home() {
           <p>了解照片要求、风格、积分、隐私，以及怎样得到更好的虚拟试穿预览。</p>
         </div>
         <div className="faq-list">
-          {faqItems.map((item) => (
-            <details key={item}>
+          {faqItems.map(({ question, answer }) => (
+            <details key={question}>
               <summary>
-                {item}
+                {question}
                 <span>⌄</span>
               </summary>
-              <p>这里先保留为折叠状态，后续可以继续补充完整回答内容。</p>
+              <p>{answer}</p>
             </details>
           ))}
         </div>
