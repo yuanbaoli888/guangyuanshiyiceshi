@@ -69,6 +69,13 @@
 - `app/core/config.py`：pydantic `Settings`，新增字段 `ai_api_base_url / ai_api_key / ai_model_2k / ai_model_4k`，从 `backend/.env` 读。
 - 认证脚手架接口不变：`/health`、`/auth/*`、`/users/*`。
 
+### 真实项目数据库地基
+- `app/models/asset.py`：`assets` 图片资产表，准备统一记录人物图、服装图、结果图的存储位置、尺寸、文件大小、hash、软删除状态。
+- `app/models/tryon_job.py`：`tryon_jobs` 生成任务表，准备记录每次试衣的素材、状态、模型名、提示词快照、失败原因和积分成本。
+- `app/models/billing.py`：`credit_accounts` 积分账户表 + `credit_transactions` 积分流水表，准备支持赠送、消费、退款和对账。
+- `migrations/versions/20260618_0001_product_foundation.py`：新增以上真实项目地基表；迁移已接到 `0001_create_users` 后面，`0001_create_users` 也做了表存在时跳过，便于兼容已有本地库。
+- 注意：这些表目前只是产品化地基，现有一键试衣接口仍是同步生成；下一步再逐步接入任务表、积分扣费、图片落库和历史记录。
+
 ### 前端 `frontend/src/`
 - `pages/Home.jsx`：首页全部内容（约 600 行）。
 - `App.jsx`：顶栏导航 + 路由。
@@ -160,9 +167,9 @@ cfeffd4 Add virtual try-on backend endpoint via vveai
 
 - **比例精确化**：目前比例只是提示词、且选择器已删，实际不保证输出比例。要 1:1/16:9 精确出图需生成后裁剪/扩图。
 - **下载**：现在是新标签打开模型返回的远程图（链接会过期），未做后端代理强制下载/落地保存。
-- **无积分/限流**：UI 上的"积分"是占位，没有真实扣费、防刷。
-- **无结果历史**：结果只是临时 URL，未存数据库/对象存储。
-- **认证未与试衣打通**：`/tryon/generate` 目前不校验登录。
+- **积分/限流未接入业务流**：已建 `credit_accounts` / `credit_transactions` 表，但还没有真实扣费、防刷和失败退款。
+- **结果历史未接入业务流**：已建 `tryon_jobs` / `assets` 表，但现有结果仍只是临时 URL，尚未存对象存储或落历史记录。
+- **认证已与试衣打通**：`/tryon/generate` 已要求登录；未登录前端按钮会引导登录/注册。
 - 效果依赖所选模型：**换模型后务必拿真实图实测**人脸还原、衣服花纹是否够准。
 
 ## 九、给新 AI 的注意事项

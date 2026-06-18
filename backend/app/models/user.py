@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
 
@@ -26,3 +26,8 @@ class User(Base):
         server_default=func.now(),
         nullable=False,
     )
+
+    assets = relationship("Asset", back_populates="user", cascade="all, delete-orphan")
+    tryon_jobs = relationship("TryonJob", back_populates="user", cascade="all, delete-orphan")
+    credit_account = relationship("CreditAccount", back_populates="user", cascade="all, delete-orphan", uselist=False)
+    credit_transactions = relationship("CreditTransaction", back_populates="user", cascade="all, delete-orphan")
