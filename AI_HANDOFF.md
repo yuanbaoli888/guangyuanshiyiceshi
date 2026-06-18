@@ -4,7 +4,7 @@
 
 ## 新窗口建议开场白
 
-> 请先阅读项目根目录的 `AI_HANDOFF.md`，了解项目现状、技术栈、虚拟试穿是怎么实现的、如何换模型、运行方式和 Git 规则。读完先用中文总结你理解到的现状，再继续我的新需求。
+> 请先阅读项目根目录的 `AI_HANDOFF.md`，了解项目现状、当前分支、已经完成的产品化阶段、虚拟试穿/换模型方式、运行方式、Git 规则和后续计划。读完先用中文总结你理解到的现状，再继续我的新需求。
 
 ---
 
@@ -13,13 +13,21 @@
 `光原TryOn`（Guangyuan TryOn）——一个**在线虚拟试穿**网页产品。用户上传人物照 + 服装图，点「一键试衣」，AI 把衣服穿到人物身上并返回效果图。
 项目最初是一个全栈认证脚手架，现已演进为带**真实可用试衣功能**的产品页。
 
-### 当前存储点（2026-06-14）
+### 当前存储点（2026-06-18）
 - GitHub 仓库：`https://github.com/yuanbaoli888/guangyuanshiyiceshi`
-- 分支：`main`
-- 当前顶部提交：`77a54f7 Store current project handoff state`
-- 本地 `main` 已跟踪 `origin/main`，当前项目已整体推送到 GitHub。
-- 继续开发时：先 `git pull` 同步远程，再小步修改、验证、提交、`git push`。
+- 当前开发分支：`product-foundation`
+- 当前顶部提交：`b2dc99f Track try-on jobs during generation`
+- 分支来源：从原开发分支 `text` 继续创建，用于把 demo 往真实项目产品化推进；原 `text` 分支仍停在 `1d6ebcb Require login for try-on generation`。
+- 继续开发时：优先留在 `product-foundation` 分支小步修改、验证、提交、推送；确认稳定后再决定是否合并回主线。
 - 注意：`backend/.env`、API Key、`incoming-photos/` 原图、`.claude/` 本地配置不作为项目代码上传。
+
+### 当前阶段总览（新对话先看这里）
+- 已完成：未登录不能一键试衣。前端按钮会引导登录/注册，后端 `/tryon/generate` 也要求有效 JWT。
+- 已完成：FAQ 文案、指南/决策区视觉迭代、上传示例图和 hover 展示等首页产品展示优化。
+- 已完成第一阶段：真实项目数据库地基，新增 `assets`、`tryon_jobs`、`credit_accounts`、`credit_transactions` 及 Alembic 迁移。
+- 已完成第二阶段：一键试衣仍同步返回图片，但每次生成会落 `tryon_jobs`；成功写结果 `assets`，失败写错误状态和错误信息；返回里新增 `job_id`。
+- 已预留但未启用：积分扣费、失败退款、积分规则、防刷限流。预留位置在 `backend/app/services/tryon_jobs.py` 的 `reserve_tryon_credits(...)` 和 `refund_tryon_credits(...)`。
+- 后续建议：对象存储落图、历史记录页面、结果详情页、真正异步任务队列、积分/套餐方案、后台管理、前端组件拆分。
 
 ## 二、技术栈
 
@@ -147,20 +155,21 @@ npx vite --host 0.0.0.0 --port 5173
 - 只要 AI 改/加/删代码或文件，都要 `git add` + `git commit`。
 - 不要随意丢弃用户改动。
 - 危险操作（`reset` / 回滚 / 删分支 / `--force` 等）**必须先确认**。
-- 分支：`main`。
+- 当前产品化开发分支：`product-foundation`。
+- 原开发分支：`text`，当前停在 `1d6ebcb Require login for try-on generation`。产品化改动先在 `product-foundation` 上验证，确认后再决定是否合并回主线。
 
 ### 当前代码状态（顶部提交，新→旧）
 ```
+b2dc99f Track try-on jobs during generation
+97d7456 Add product database foundation
+1d6ebcb Require login for try-on generation
+2437d7b Update FAQ copy
+4c920be Add hover images to guide steps
+4029767 Restyle compare cards with overlap
+71ac3c7 Update stored handoff commit pointer
 77a54f7 Store current project handoff state
-904dc20 Add hover-driven decision previews
-37cbefb Add feature card icons and hover states
-b83da71 Update AI_HANDOFF with try-on integration and model-swap guide
-fc627c5 Remove style/ratio controls, keep 2K/4K size selection
-7a699bd Wire one-click try-on generation in frontend
-cfeffd4 Add virtual try-on backend endpoint via vveai
-5f21067 Use real photos for style preset cards
 ```
-写本存储点时：代码已推送到 GitHub；工作区只剩本地未跟踪 `.claude/`，不属于项目提交内容。
+写本存储点时：当前分支为 `product-foundation`；工作区只剩本地未跟踪 `.claude/`，不属于项目提交内容。
 
 ---
 
@@ -172,6 +181,13 @@ cfeffd4 Add virtual try-on backend endpoint via vveai
 - **结果历史部分接入业务流**：已建 `tryon_jobs` / `assets` 表，并且生成接口会落任务和结果资产；但结果仍只是第三方临时 URL，尚未存对象存储。
 - **认证已与试衣打通**：`/tryon/generate` 已要求登录；未登录前端按钮会引导登录/注册。
 - 效果依赖所选模型：**换模型后务必拿真实图实测**人脸还原、衣服花纹是否够准。
+
+建议后续推进顺序：
+1. 对象存储落图：生成成功后把第三方结果图下载到自有 OSS/COS/R2/S3，`assets` 保存 `storage_key`，下载走后端签名链接。
+2. 历史记录/结果详情：用 `GET /tryon/jobs` 和 `GET /tryon/jobs/{job_id}` 做前端历史页面和结果详情页。
+3. 积分方案落地：用户确认扣费/赠送/退款规则后，在 `reserve_tryon_credits(...)` / `refund_tryon_credits(...)` 接入真实余额和流水。
+4. 异步任务队列：把当前同步生成改成创建任务后由 worker 执行，前端轮询任务状态。
+5. 后台管理：查看用户、任务、失败原因、积分流水，支持人工退款/删除违规图片。
 
 ## 九、给新 AI 的注意事项
 
